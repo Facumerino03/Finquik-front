@@ -28,7 +28,7 @@ const Chart: React.FC<ChartProps> = ({
   const totalAngle = 180; // Total 180 grados para semicírculo perfecto
   
   // Gap entre segmentos (en grados)
-  const gapAngle = 14;
+  const gapAngle = 15;
   
   // Calcular ángulos disponibles después del gap
   const availableAngle = totalAngle - gapAngle;
@@ -147,21 +147,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    top: '60%',
+    top: '50%',
   },
   balanceAmount: {
-    fontSize: 48,
-    fontWeight: 'bold',
-    color: '#000000',
+    fontSize: 52,
+    fontFamily: 'Inter_700Bold',
+    color: '#09090b',
     textAlign: 'center',
   },
   balanceLabel: {
-    fontSize: 18,
-    color: '#6B7280',
+    fontSize: 22,
+    fontFamily: 'Inter_500Medium',
+    color: '#71717a',
     textAlign: 'center',
-    marginTop: 4,
     width: '100%',
   },
 });
 
 export default Chart;
+
+//TODO: Configure balance font size for formatting big numbers
