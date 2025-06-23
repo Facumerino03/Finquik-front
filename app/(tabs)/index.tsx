@@ -5,7 +5,7 @@ import Header from '../../components/Header';
 
 export default function HomeScreen() {
   // Datos de ejemplo
-  const incomeAmount = 2830;
+  const incomeAmount = 28300;
   const expensesAmount = 18300;
 
   return (
