@@ -1,10 +1,13 @@
 import { Settings, UserRound } from 'lucide-react-native';
 import React from 'react';
-import { StatusBar, TouchableOpacity, View } from 'react-native';
+import { StatusBar, TouchableOpacity, View, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAuth } from '../core/contexts/AuthContext';
+import { router } from 'expo-router';
 
 export default function Header() {
   const insets = useSafeAreaInsets();
+  const { logout } = useAuth();
 
   const handleProfilePress = () => {
     // Navegar a perfil
@@ -12,8 +15,21 @@ export default function Header() {
   };
 
   const handleSettingsPress = () => {
-    // Navegar a configuración
-    //router.push('/settings');
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro que quieres cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { 
+          text: 'Cerrar Sesión', 
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            router.replace('/(auth)/login');
+          }
+        }
+      ]
+    );
   };
 
   return (
