@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
 interface ChartProps {
@@ -9,38 +9,35 @@ interface ChartProps {
   strokeWidth?: number;
 }
 
+type SelectedSegment = 'none' | 'income' | 'expenses';
+
 const Chart: React.FC<ChartProps> = ({ 
   income, 
   expenses, 
   size = 300, 
   strokeWidth = 25 
 }) => {
+  const [selectedSegment, setSelectedSegment] = useState<SelectedSegment>('none');
+  
   const balance = income - expenses;
   const total = income + expenses;
   
-  // Configuración del gráfico
   const radius = (size - strokeWidth) / 2;
   const centerX = size / 2;
   const centerY = size / 2;
-  
-  // Ángulos para el semicírculo (180 grados total)
-  const startAngle = 180; // Comenzar en 180 grados (lado izquierdo)
-  const totalAngle = 180; // Total 180 grados para semicírculo perfecto
-  
-  // Gap entre segmentos (en grados)
+
+  const startAngle = 180;
+  const totalAngle = 180;
+
   const gapAngle = 15;
   
-  // Calcular ángulos disponibles después del gap
   const availableAngle = totalAngle - gapAngle;
   
-  // Calcular ángulos para cada segmento con gap
   const incomeAngle = total > 0 ? (income / total) * availableAngle : 0;
   const expensesAngle = total > 0 ? (expenses / total) * availableAngle : 0;
   
-  // Función para convertir grados a radianes
   const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
   
-  // Función para crear path del arco
   const createArcPath = (
     startAngleDeg: number,
     endAngleDeg: number,
@@ -61,7 +58,40 @@ const Chart: React.FC<ChartProps> = ({
     return `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`;
   };
   
-  // Calcular paths para cada segmento con gap
+  const isPointInArc = (
+    x: number, 
+    y: number, 
+    startAngleDeg: number, 
+    endAngleDeg: number
+  ) => {
+    const dx = x - centerX;
+    const dy = y - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    const innerRadius = radius - strokeWidth / 2;
+    const outerRadius = radius + strokeWidth / 2;
+    
+    if (distance < innerRadius || distance > outerRadius) {
+      return false;
+    }
+    
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    if (angle < 0) angle += 360;
+    
+    let normalizedStart = startAngleDeg;
+    let normalizedEnd = endAngleDeg;
+    let normalizedAngle = angle;
+    
+    if (normalizedStart > normalizedEnd) {
+      if (normalizedAngle < normalizedStart) {
+        normalizedAngle += 360;
+      }
+      normalizedEnd += 360;
+    }
+    
+    return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
+  };
+  
   const incomeEndAngle = startAngle + incomeAngle;
   const expensesStartAngle = incomeEndAngle + gapAngle;
   const expensesEndAngle = expensesStartAngle + expensesAngle;
@@ -82,7 +112,48 @@ const Chart: React.FC<ChartProps> = ({
     centerY
   );
   
-  // Formatear moneda
+  const handleSvgTouch = (event: any) => {
+    const { locationX, locationY } = event.nativeEvent;
+    
+    if (income > 0 && isPointInArc(locationX, locationY, startAngle, incomeEndAngle)) {
+      setSelectedSegment(selectedSegment === 'income' ? 'none' : 'income');
+    } else if (expenses > 0 && isPointInArc(locationX, locationY, expensesStartAngle, expensesEndAngle)) {
+      setSelectedSegment(selectedSegment === 'expenses' ? 'none' : 'expenses');
+    } else {
+      setSelectedSegment('none');
+    }
+  };
+
+  const handleContainerTouch = () => {
+    setSelectedSegment('none');
+  };
+  
+  const getSegmentColor = (segment: 'income' | 'expenses') => {
+    if (selectedSegment === 'none') {
+      return segment === 'income' ? '#00c950' : '#fb2c36';
+    }
+    
+    if (selectedSegment === segment) {
+      return segment === 'income' ? '#00c950' : '#fb2c36';
+    }
+    
+    return '#e4e4e7';
+  };
+  
+  const getCenterContent = () => {
+    switch (selectedSegment) {
+      case 'income':
+        return { value: income, label: 'Income' };
+      case 'expenses':
+        return { value: expenses, label: 'Expenses' };
+      default:
+        return { value: balance, label: 'Balance' };
+    }
+  };
+  
+  const centerContent = getCenterContent();
+  
+  //TODO: for further updates, see what happens when is multicurrency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -93,43 +164,51 @@ const Chart: React.FC<ChartProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.chartContainer, { width: size, height: size * 0.6 }]}>
-        <Svg width={size} height={size * 0.6} viewBox={`0 0 ${size} ${size * 0.6}`}>
-          <G>
-            {/* Segmento de ingresos (verde) */}
-            {income > 0 && (
-              <Path
-                d={incomePath}
-                stroke="#00c950"
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                fill="none"
-              />
-            )}
-            
-            {/* Segmento de gastos (rojo) */}
-            {expenses > 0 && (
-              <Path
-                d={expensesPath}
-                stroke="#fb2c36"
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                fill="none"
-              />
-            )}
-          </G>
-        </Svg>
-        
-        {/* Contenido central */}
-        <View style={styles.centerContent}>
-          <Text style={styles.balanceAmount}>
-            {formatCurrency(balance)}
-          </Text>
-          <Text style={styles.balanceLabel}>Balance</Text>
+    <TouchableWithoutFeedback onPress={handleContainerTouch}>
+      <View style={styles.container}>
+        <View style={[styles.chartContainer, { width: size, height: size * 0.6 }]}>
+          <TouchableWithoutFeedback onPress={handleSvgTouch}>
+            <Svg width={size} height={size * 0.6} viewBox={`0 0 ${size} ${size * 0.6}`}>
+              <G>
+                {/* Segmento de ingresos */}
+                {income > 0 && (
+                  <Path
+                    d={incomePath}
+                    stroke={getSegmentColor('income')}
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                )}
+                
+                {/* Segmento de gastos */}
+                {expenses > 0 && (
+                  <Path
+                    d={expensesPath}
+                    stroke={getSegmentColor('expenses')}
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                )}
+              </G>
+            </Svg>
+          </TouchableWithoutFeedback>
+          
+          {/* Contenido central */}
+          <TouchableWithoutFeedback onPress={handleContainerTouch}>
+            <View style={styles.centerContent}>
+              <Text style={styles.balanceAmount}>
+                {formatCurrency(centerContent.value)}
+              </Text>
+              <Text style={styles.balanceLabel}>
+                {centerContent.label}
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -165,5 +244,3 @@ const styles = StyleSheet.create({
 });
 
 export default Chart;
-
-//TODO: Configure balance font size for formatting big numbers

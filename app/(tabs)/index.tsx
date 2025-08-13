@@ -1,20 +1,21 @@
 import React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import Chart from '../../components/Chart';
 import Header from '../../components/Header';
+import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary';
 
 export default function HomeScreen() {
-  // Datos de ejemplo
-  const incomeAmount = 28300;
-  const expensesAmount = 18300;
+  const { totalIncome, totalExpenses, balance, isLoading, error, refresh } = useTransactionsSummary();
+
+  console.log('HomeScreen data:', { totalIncome, totalExpenses, balance, isLoading, error });
 
   return (
     <SafeAreaView style={styles.container}>
       <Header />
       <View style={styles.content}>
         <Chart 
-          income={incomeAmount}
-          expenses={expensesAmount}
+          income={totalIncome}
+          expenses={totalExpenses}
           size={320}
           strokeWidth={30}
         />
