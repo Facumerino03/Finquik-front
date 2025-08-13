@@ -3,6 +3,7 @@ import {
   BanknoteArrowUp,
   BanknoteArrowDown,
   Landmark,
+  Plus,
 } from "lucide-react-native";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
@@ -25,7 +26,8 @@ export default function FloatingTabBar({
     index: { background: "#f4f4f5", icon: "#09090b" }, 
     incomes: { background: "#dcfce7", icon: "#00c950" }, 
     expenses: { background: "#ffe2e2", icon: "#fb2c36" }, 
-    accounts: { background: "#dbeafe", icon: "#2b7fff" }, 
+    accounts: { background: "#dbeafe", icon: "#2b7fff" },
+    add: { background: '#09090b', icon: '#ffffff' } 
   };
 
   const getIcon = (routeName: string, color: string) => {
@@ -40,17 +42,39 @@ export default function FloatingTabBar({
         return <BanknoteArrowDown {...iconProps} />;
       case "accounts":
         return <Landmark {...iconProps} />;
+      case "add":
+        return <Plus {...iconProps} />;
       default:
         return <Home {...iconProps} />;
     }
+  };
+
+  const getTabStyle = (routeName: string, isFocused: boolean) => {
+    const routeColors = tabColors[routeName as keyof typeof tabColors] || tabColors.index;
+    
+    if (routeName === 'add') {
+      return {
+        backgroundColor: routeColors.background,
+      };
+    }
+    
+    return isFocused ? { backgroundColor: routeColors.background } : {};
+  };
+
+  const getIconColor = (routeName: string, isFocused: boolean) => {
+    const routeColors = tabColors[routeName as keyof typeof tabColors] || tabColors.index;
+    
+    if (routeName === 'add') {
+      return routeColors.icon;
+    }
+    
+    return isFocused ? routeColors.icon : "#09090b";
   };
 
   return (
     <View style={[styles.container, { bottom: insets.bottom + 20 }]}>
         {state.routes.map((route: any, index: number) => {
           const isFocused = state.index === index;
-          const routeColors =
-            tabColors[route.name as keyof typeof tabColors] || tabColors.index;
 
           const onPress = () => {
             const event = navigation.emit({
@@ -70,12 +94,10 @@ export default function FloatingTabBar({
               onPress={onPress}
               style={[
                 styles.tab,
-                isFocused && {
-                  backgroundColor: routeColors.background,
-                },
+                getTabStyle(route.name, isFocused)
               ]}
             >
-              {getIcon(route.name, isFocused ? routeColors.icon : "#09090b")}
+              {getIcon(route.name, getIconColor(route.name, isFocused))}
             </TouchableOpacity>
           );
         })}
