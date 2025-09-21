@@ -152,7 +152,7 @@ const Chart: React.FC<ChartProps> = ({
   const getCenterContent = () => {
     // Si no hay transacciones, mostrar mensaje de estado vacío
     if (total === 0) {
-      return { value: 0, label: 'Comienza agregando una transacción' };
+      return { value: 0, label: 'Start adding your first transaction' };
     }
     
     switch (selectedSegment) {
