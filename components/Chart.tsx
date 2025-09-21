@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
 
 interface ChartProps {
@@ -111,6 +111,15 @@ const Chart: React.FC<ChartProps> = ({
     centerX,
     centerY
   );
+
+  // Crear arco completo gris para estado vacío
+  const emptyStatePath = createArcPath(
+    startAngle,
+    startAngle + totalAngle, // Usar totalAngle (180°) en lugar de availableAngle
+    radius,
+    centerX,
+    centerY
+  );
   
   const handleSvgTouch = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
@@ -141,6 +150,11 @@ const Chart: React.FC<ChartProps> = ({
   };
   
   const getCenterContent = () => {
+    // Si no hay transacciones, mostrar mensaje de estado vacío
+    if (total === 0) {
+      return { value: 0, label: 'Comienza agregando una transacción' };
+    }
+    
     switch (selectedSegment) {
       case 'income':
         return { value: income, label: 'Income' };
@@ -170,6 +184,17 @@ const Chart: React.FC<ChartProps> = ({
           <TouchableWithoutFeedback onPress={handleSvgTouch}>
             <Svg width={size} height={size * 0.6} viewBox={`0 0 ${size} ${size * 0.6}`}>
               <G>
+                {/* Estado vacío: arco completo gris */}
+                {total === 0 && (
+                  <Path
+                    d={emptyStatePath}
+                    stroke="#f4f4f5" // zinc-100
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                )}
+                
                 {/* Segmento de ingresos */}
                 {income > 0 && (
                   <Path
@@ -199,9 +224,9 @@ const Chart: React.FC<ChartProps> = ({
           <TouchableWithoutFeedback onPress={handleContainerTouch}>
             <View style={styles.centerContent}>
               <Text style={styles.balanceAmount}>
-                {formatCurrency(centerContent.value)}
+                {total === 0 ? '$0' : formatCurrency(centerContent.value)}
               </Text>
-              <Text style={styles.balanceLabel}>
+              <Text style={[styles.balanceLabel, total === 0 && styles.emptyStateLabel]}>
                 {centerContent.label}
               </Text>
             </View>
@@ -240,6 +265,13 @@ const styles = StyleSheet.create({
     color: '#71717a',
     textAlign: 'center',
     width: '100%',
+  },
+  emptyStateLabel: {
+    fontSize: 18,
+    fontFamily: 'Inter_500Medium',
+    color: '#71717a',
+    textAlign: 'center',
+    maxWidth: 200,
   },
 });
 
