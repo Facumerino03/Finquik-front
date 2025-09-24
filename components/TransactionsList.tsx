@@ -31,10 +31,10 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
     });
   };
 
-  const getTransactionIcon = (type: 'income' | 'expense') => {
+  const getTransactionIcon = (type: 'INCOME' | 'EXPENSE') => {
     const iconProps = { size: 20 };
     
-    if (type === 'income') {
+    if (type === 'INCOME') {
       return (
         <View className="w-14 h-14 bg-green-200 rounded-full items-center justify-center">
           <ArrowBigUp {...iconProps} color="#00c950" />
@@ -49,12 +49,12 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
     }
   };
 
-  const getAmountColor = (type: 'income' | 'expense') => {
-    return type === 'income' ? 'text-green-600' : 'text-red-600';
+  const getAmountColor = (type: 'INCOME' | 'EXPENSE') => {
+    return type === 'INCOME' ? 'text-green-600' : 'text-red-600';
   };
 
-  const getAmountPrefix = (type: 'income' | 'expense') => {
-    return type === 'income' ? '+' : '-';
+  const getAmountPrefix = (type: 'INCOME' | 'EXPENSE') => {
+    return type === 'INCOME' ? '+' : '-';
   };
 
   return (
@@ -89,21 +89,21 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
             >
               {/* Left side: Icon and Description/Date */}
               <View className="flex-row items-center flex-1">
-                {getTransactionIcon(transaction.type)}
+                {getTransactionIcon(transaction.category.type)}
                 <View className="ml-4 flex-1">
                   <Text className="text-zinc-950 text-lg font-geist-medium">
                     {transaction.description}
                   </Text>
                   <Text className="text-zinc-500 text-base font-geist">
-                    {formatDate(transaction.date)}
+                    {formatDate(transaction.transactionDate)}
                   </Text>
                 </View>
               </View>
 
               {/* Right side: Amount */}
               <View className="items-end">
-                <Text className={`text-lg font-geist-bold ${getAmountColor(transaction.type)}`}>
-                  {getAmountPrefix(transaction.type)}{formatCurrency(transaction.amount)}
+                <Text className={`text-lg font-geist-bold ${getAmountColor(transaction.category.type)}`}>
+                  {getAmountPrefix(transaction.category.type)}{formatCurrency(transaction.amount)}
                 </Text>
               </View>
             </View>

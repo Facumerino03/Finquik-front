@@ -26,15 +26,12 @@ const Chart: React.FC<ChartProps> = ({
   const centerX = size / 2;
   const centerY = size / 2;
 
+  // Para un semicírculo perfecto, empezamos desde 180° (izquierda) hasta 360° (derecha)
   const startAngle = 180;
-  const totalAngle = 180;
+  const endAngle = 360;
+  const totalAngle = 180; // 180 grados para un semicírculo
 
-  const gapAngle = 15;
-  
-  const availableAngle = totalAngle - gapAngle;
-  
-  const incomeAngle = total > 0 ? (income / total) * availableAngle : 0;
-  const expensesAngle = total > 0 ? (expenses / total) * availableAngle : 0;
+  const gapAngle = 15; // Aumentar el gap para que sea más visible
   
   const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
   
@@ -92,12 +89,38 @@ const Chart: React.FC<ChartProps> = ({
     return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
   };
   
-  const incomeEndAngle = startAngle + incomeAngle;
-  const expensesStartAngle = incomeEndAngle + gapAngle;
-  const expensesEndAngle = expensesStartAngle + expensesAngle;
+  // Calcular los ángulos de los segmentos
+  let incomeStartAngle, incomeEndAngle, expensesStartAngle, expensesEndAngle;
+  
+  if (total === 0) {
+    // Sin transacciones
+    incomeStartAngle = incomeEndAngle = expensesStartAngle = expensesEndAngle = 0;
+  } else if (income > 0 && expenses > 0) {
+    // Ambos tipos presentes - aplicar gap
+    const availableAngle = totalAngle - gapAngle;
+    const incomeAngle = (income / total) * availableAngle;
+    const expensesAngle = (expenses / total) * availableAngle;
+    
+    incomeStartAngle = startAngle;
+    incomeEndAngle = incomeStartAngle + incomeAngle;
+    expensesStartAngle = incomeEndAngle + gapAngle;
+    expensesEndAngle = expensesStartAngle + expensesAngle;
+  } else if (income > 0) {
+    // Solo ingresos - ocupar todo el semicírculo
+    incomeStartAngle = startAngle;
+    incomeEndAngle = endAngle;
+    expensesStartAngle = expensesEndAngle = 0;
+  } else if (expenses > 0) {
+    // Solo gastos - ocupar todo el semicírculo
+    expensesStartAngle = startAngle;
+    expensesEndAngle = endAngle;
+    incomeStartAngle = incomeEndAngle = 0;
+  } else {
+    incomeStartAngle = incomeEndAngle = expensesStartAngle = expensesEndAngle = 0;
+  }
   
   const incomePath = createArcPath(
-    startAngle,
+    incomeStartAngle,
     incomeEndAngle,
     radius,
     centerX,
@@ -115,7 +138,7 @@ const Chart: React.FC<ChartProps> = ({
   // Crear arco completo gris para estado vacío
   const emptyStatePath = createArcPath(
     startAngle,
-    startAngle + totalAngle, // Usar totalAngle (180°) en lugar de availableAngle
+    endAngle,
     radius,
     centerX,
     centerY
@@ -124,7 +147,7 @@ const Chart: React.FC<ChartProps> = ({
   const handleSvgTouch = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
     
-    if (income > 0 && isPointInArc(locationX, locationY, startAngle, incomeEndAngle)) {
+    if (income > 0 && isPointInArc(locationX, locationY, incomeStartAngle, incomeEndAngle)) {
       setSelectedSegment(selectedSegment === 'income' ? 'none' : 'income');
     } else if (expenses > 0 && isPointInArc(locationX, locationY, expensesStartAngle, expensesEndAngle)) {
       setSelectedSegment(selectedSegment === 'expenses' ? 'none' : 'expenses');
@@ -167,7 +190,6 @@ const Chart: React.FC<ChartProps> = ({
   
   const centerContent = getCenterContent();
   
-  //TODO: for further updates, see what happens when is multicurrency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -188,7 +210,7 @@ const Chart: React.FC<ChartProps> = ({
                 {total === 0 && (
                   <Path
                     d={emptyStatePath}
-                    stroke="#f4f4f5" // zinc-100
+                    stroke="#f4f4f5"
                     strokeWidth={strokeWidth}
                     strokeLinecap="round"
                     fill="none"

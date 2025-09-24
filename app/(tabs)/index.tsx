@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Chart from '../../components/Chart';
 import Header from '../../components/Header';
 import TransactionsList from '../../components/TransactionsList';
@@ -8,14 +8,40 @@ import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary'
 
 export default function HomeScreen() {
   const { totalIncome, totalExpenses, balance, isLoading, error, refresh } = useTransactionsSummary();
-  const { recentTransactions, isLoading: transactionsLoading } = useTransactions();
+  const { recentTransactions, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
 
-  console.log('HomeScreen data:', { totalIncome, totalExpenses, balance, isLoading, error });
+  console.log('HomeScreen data:', { 
+    totalIncome, 
+    totalExpenses, 
+    balance, 
+    isLoading, 
+    error,
+    transactionsCount: recentTransactions.length,
+    transactionsLoading,
+    transactionsError
+  });
 
   const handleSeeAllPress = () => {
     // TODO: Navegar a pantalla de todas las transacciones
     console.log('Navigate to all transactions');
   };
+
+  const handleRefresh = () => {
+    refresh();
+  };
+
+  // Mostrar loading si están cargando los datos principales
+  if (isLoading || transactionsLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Header />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#1F2937" />
+          <Text style={styles.loadingText}>Loading your financial data...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -29,6 +55,14 @@ export default function HomeScreen() {
             strokeWidth={30}
           />
         </View>
+        
+        {/* Mostrar error si hay problemas con las transacciones */}
+        {transactionsError && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{transactionsError}</Text>
+            <Text style={styles.errorSubtext}>Pull down to refresh</Text>
+          </View>
+        )}
         
         {/* Transactions List */}
         <View style={styles.transactionsContainer}>
@@ -57,6 +91,37 @@ const styles = StyleSheet.create({
     marginTop: 30,
     alignItems: 'center',
     paddingHorizontal: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  errorContainer: {
+    backgroundColor: '#FEF2F2',
+    borderColor: '#FECACA',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
+  errorText: {
+    color: '#DC2626',
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  errorSubtext: {
+    color: '#DC2626',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 4,
   },
   transactionsContainer: {
     marginTop: 30,
