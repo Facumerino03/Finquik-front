@@ -14,6 +14,6 @@ export function useTransactions() {
     recentTransactions: getRecentTransactions(),
     isLoading: context.isLoading,
     error: context.error,
-    refresh: context.refreshTransactions,
+    refresh: context.refresh,
   };
 }

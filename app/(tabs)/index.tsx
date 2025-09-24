@@ -7,7 +7,7 @@ import { useTransactions } from '../../core/hooks/useTransactions';
 import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary';
 
 export default function HomeScreen() {
-  const { totalIncome, totalExpenses, balance, isLoading, error, refresh } = useTransactionsSummary();
+  const { totalIncome, totalExpenses, balance, isLoading, error } = useTransactionsSummary();
   const { recentTransactions, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
 
   console.log('HomeScreen data:', { 
@@ -24,10 +24,6 @@ export default function HomeScreen() {
   const handleSeeAllPress = () => {
     // TODO: Navegar a pantalla de todas las transacciones
     console.log('Navigate to all transactions');
-  };
-
-  const handleRefresh = () => {
-    refresh();
   };
 
   // Mostrar loading si están cargando los datos principales
@@ -60,7 +56,6 @@ export default function HomeScreen() {
         {transactionsError && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{transactionsError}</Text>
-            <Text style={styles.errorSubtext}>Pull down to refresh</Text>
           </View>
         )}
         
@@ -116,12 +111,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     fontWeight: '500',
-  },
-  errorSubtext: {
-    color: '#DC2626',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 4,
   },
   transactionsContainer: {
     marginTop: 30,

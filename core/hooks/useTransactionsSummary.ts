@@ -9,6 +9,6 @@ export function useTransactionsSummary() {
     balance: context.balance,
     isLoading: context.isLoading,
     error: context.error,
-    refresh: context.refreshSummary,
+    refresh: context.refresh,
   };
 }

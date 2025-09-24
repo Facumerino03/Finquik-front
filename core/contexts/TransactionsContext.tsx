@@ -24,8 +24,6 @@ interface TransactionsContextType {
   
   // Acciones
   refresh: () => Promise<void>;
-  refreshTransactions: () => Promise<void>;
-  refreshSummary: () => Promise<void>;
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(undefined);
@@ -94,16 +92,6 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
     }
   };
 
-  const refreshTransactions = async () => {
-    setIsLoading(true);
-    await fetchTransactions();
-    setIsLoading(false);
-  };
-
-  const refreshSummary = async () => {
-    await fetchSummary();
-  };
-
   const refresh = async () => {
     setIsLoading(true);
     await Promise.all([fetchTransactions(), fetchSummary()]);
@@ -129,9 +117,7 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
         balance,
         isLoading,
         error,
-        refresh,
-        refreshTransactions,
-        refreshSummary
+        refresh
       }}
     >
       {children}
