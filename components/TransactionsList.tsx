@@ -9,7 +9,8 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   showAllButton = true,
   onSeeAllPress,
   maxItems = 4,
-  emptyStateType = 'all'
+  emptyStateType = 'all',
+  showTitle = true // Por defecto mostrar el título
 }) => {
   const displayTransactions = transactions.slice(0, maxItems);
 
@@ -59,22 +60,24 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
 
   return (
     <View className="bg-white px-5">
-      {/* Header */}
-      <View 
-        className="flex-row justify-between items-center"
-        style={{ marginBottom: 24 }}
-      >
-        <Text className="text-zinc-950 text-2xl font-geist-semibold">
-          Recent transactions
-        </Text>
-        {showAllButton && (
-          <TouchableOpacity onPress={onSeeAllPress} activeOpacity={0.7}>
-            <Text className="text-zinc-500 text-base font-geist-medium">
-              See all
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      {/* Header - Solo mostrar si showTitle es true */}
+      {showTitle && (
+        <View 
+          className="flex-row justify-between items-center"
+          style={{ marginBottom: 24 }}
+        >
+          <Text className="text-zinc-950 text-2xl font-geist-semibold">
+            Recent transactions
+          </Text>
+          {showAllButton && (
+            <TouchableOpacity onPress={onSeeAllPress} activeOpacity={0.7}>
+              <Text className="text-zinc-500 text-base font-geist-medium">
+                See all
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
       {/* Transactions List */}
       <View>

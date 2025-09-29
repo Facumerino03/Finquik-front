@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Chart from '../../components/Chart';
@@ -22,8 +23,7 @@ export default function HomeScreen() {
   });
 
   const handleSeeAllPress = () => {
-    // TODO: Navegar a pantalla de todas las transacciones
-    console.log('Navigate to all transactions');
+    router.push('/all-transactions');
   };
 
   // Mostrar loading si están cargando los datos principales

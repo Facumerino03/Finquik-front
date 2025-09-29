@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import CategoryChart from '../../components/CategoryChart';
@@ -11,8 +12,7 @@ export default function IncomesScreen() {
   const { categoryData, isLoading: categoriesLoading, error: categoriesError } = useCategoryData('INCOME', incomeTransactions);
 
   const handleSeeAllPress = () => {
-    // TODO: Navegar a pantalla de todas las transacciones con filtro de ingresos
-    console.log('Navigate to all income transactions');
+    router.push('/all-transactions');
   };
 
   const isLoading = transactionsLoading || categoriesLoading;
