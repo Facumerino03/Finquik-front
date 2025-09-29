@@ -1,5 +1,5 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Calendar, ChevronDown, X } from 'lucide-react-native';
+import { Calendar, Check, ChevronDown, Minus, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Modal, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Account, Category } from '../core/types/transactions';
@@ -252,21 +252,41 @@ export default function FilterModal({
                 }`}>
                   {getSelectedAccountName()}
                 </Text>
-                <ChevronDown size={20} color="#71717b" />
+                {showAccountDropdown ? (
+                  <Minus size={20} color="#71717b" />
+                ) : (
+                  <ChevronDown size={20} color="#71717b" />
+                )}
               </TouchableOpacity>
               
               {showAccountDropdown && (
-                <View className="mt-2 bg-white border border-zinc-200 rounded-lg max-h-40">
-                  <ScrollView showsVerticalScrollIndicator={false}>
+                <View className="mt-2 bg-white border border-zinc-200 rounded-lg max-h-40 overflow-hidden">
+                  <ScrollView 
+                    showsVerticalScrollIndicator={false}
+                    nestedScrollEnabled={true}
+                    scrollEnabled={true}
+                    style={{ maxHeight: 160 }}
+                  >
                     <TouchableOpacity
                       onPress={() => {
                         setSelectedAccountId(null);
                         setShowAccountDropdown(false);
                       }}
-                      className="px-4 py-3 border-b border-zinc-200"
+                      className={`px-4 py-3 ${
+                        selectedAccountId === null 
+                          ? 'bg-zinc-100' 
+                          : 'bg-transparent'
+                      }`}
                       activeOpacity={0.7}
                     >
-                      <Text className="text-base font-geist text-zinc-400">All accounts</Text>
+                      <View className="flex-row items-center justify-between">
+                        <Text className="text-base font-geist text-zinc-950">
+                          All accounts
+                        </Text>
+                        {selectedAccountId === null && (
+                          <Check size={16} color="#09090b" />
+                        )}
+                      </View>
                     </TouchableOpacity>
                     {accounts.map((account) => (
                       <TouchableOpacity
@@ -275,10 +295,21 @@ export default function FilterModal({
                           setSelectedAccountId(account.id);
                           setShowAccountDropdown(false);
                         }}
-                        className="px-4 py-3 border-b border-zinc-200"
+                        className={`px-4 py-3 ${
+                          selectedAccountId === account.id 
+                            ? 'bg-zinc-100' 
+                            : 'bg-transparent'
+                        }`}
                         activeOpacity={0.7}
                       >
-                        <Text className="text-base font-geist text-zinc-950">{account.name}</Text>
+                        <View className="flex-row items-center justify-between">
+                          <Text className="text-base font-geist text-zinc-950">
+                            {account.name}
+                          </Text>
+                          {selectedAccountId === account.id && (
+                            <Check size={16} color="#09090b" />
+                          )}
+                        </View>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
@@ -301,21 +332,41 @@ export default function FilterModal({
                 }`}>
                   {getSelectedCategoryName()}
                 </Text>
-                <ChevronDown size={20} color="#71717b" />
+                {showCategoryDropdown ? (
+                  <Minus size={20} color="#71717b" />
+                ) : (
+                  <ChevronDown size={20} color="#71717b" />
+                )}
               </TouchableOpacity>
               
               {showCategoryDropdown && (
-                <View className="mt-2 bg-white border border-zinc-200 rounded-lg max-h-40">
-                  <ScrollView showsVerticalScrollIndicator={false}>
+                <View className="mt-2 bg-white border border-zinc-200 rounded-lg max-h-40 overflow-hidden">
+                  <ScrollView 
+                    showsVerticalScrollIndicator={false}
+                    nestedScrollEnabled={true}
+                    scrollEnabled={true}
+                    style={{ maxHeight: 160 }}
+                  >
                     <TouchableOpacity
                       onPress={() => {
                         setSelectedCategoryId(null);
                         setShowCategoryDropdown(false);
                       }}
-                      className="px-4 py-3 border-b border-zinc-200"
+                      className={`px-4 py-3 ${
+                        selectedCategoryId === null 
+                          ? 'bg-zinc-100' 
+                          : 'bg-transparent'
+                      }`}
                       activeOpacity={0.7}
                     >
-                      <Text className="text-base font-geist text-zinc-400">All categories</Text>
+                      <View className="flex-row items-center justify-between">
+                        <Text className="text-base font-geist text-zinc-950">
+                          All categories
+                        </Text>
+                        {selectedCategoryId === null && (
+                          <Check size={16} color="#09090b" />
+                        )}
+                      </View>
                     </TouchableOpacity>
                     {categories.map((category) => (
                       <TouchableOpacity
@@ -324,10 +375,21 @@ export default function FilterModal({
                           setSelectedCategoryId(category.id);
                           setShowCategoryDropdown(false);
                         }}
-                        className="px-4 py-3 border-b border-zinc-200"
+                        className={`px-4 py-3 ${
+                          selectedCategoryId === category.id 
+                            ? 'bg-zinc-100' 
+                            : 'bg-transparent'
+                        }`}
                         activeOpacity={0.7}
                       >
-                        <Text className="text-base font-geist text-zinc-950">{category.name}</Text>
+                        <View className="flex-row items-center justify-between">
+                          <Text className="text-base font-geist text-zinc-950">
+                            {category.name}
+                          </Text>
+                          {selectedCategoryId === category.id && (
+                            <Check size={16} color="#09090b" />
+                          )}
+                        </View>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
