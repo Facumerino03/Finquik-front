@@ -4,10 +4,30 @@ import { Text, View } from 'react-native';
 
 interface EmptyStateProps {
   type: 'all' | 'incomes' | 'expenses';
+  isFiltered?: boolean; // Nuevo prop para indicar si hay filtros activos
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ type }) => {
+const EmptyState: React.FC<EmptyStateProps> = ({ type, isFiltered = false }) => {
   const getContent = () => {
+    // Si hay filtros activos, mostrar mensaje específico para filtros
+    if (isFiltered) {
+      return {
+        title: 'No transactions found',
+        description: 'Try adjusting your filters or add a new transaction',
+        icons: (
+          <View className="flex-row">
+            <View className="w-16 h-16 bg-red-200 rounded-full items-center justify-center">
+              <ArrowBigUp size={24} color="#fb2c36" />
+            </View>
+            <View className="w-16 h-16 bg-green-200 rounded-full items-center justify-center ml-2">
+              <ArrowBigDown size={24} color="#00c950" />
+            </View>
+          </View>
+        )
+      };
+    }
+
+    // Mensajes originales cuando no hay filtros
     switch (type) {
       case 'all':
         return {

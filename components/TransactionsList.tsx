@@ -10,7 +10,8 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   onSeeAllPress,
   maxItems = 4,
   emptyStateType = 'all',
-  showTitle = true // Por defecto mostrar el título
+  showTitle = true,
+  isFiltered = false // Nuevo prop
 }) => {
   const displayTransactions = transactions.slice(0, maxItems);
 
@@ -82,7 +83,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
       {/* Transactions List */}
       <View>
         {displayTransactions.length === 0 ? (
-          <EmptyState type={emptyStateType} />
+          <EmptyState type={emptyStateType} isFiltered={isFiltered} />
         ) : (
           displayTransactions.map((transaction, index) => (
             <View 

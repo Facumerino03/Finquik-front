@@ -3,12 +3,25 @@ import { ArrowLeft, Filter, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FilterModal from '../components/FilterModal';
 import TransactionsList from '../components/TransactionsList';
+import { useAccounts } from '../core/hooks/useAccounts';
+import { useCategories } from '../core/hooks/useCategories';
 import { useTransactions } from '../core/hooks/useTransactions';
+import { getTransactionsWithFilters, TransactionFilters } from '../core/services/transactions';
+import { Transaction } from '../core/types/transactions';
 
 export default function AllTransactionsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [isLoadingFiltered, setIsLoadingFiltered] = useState(false);
+  const [currentFilters, setCurrentFilters] = useState<TransactionFilters>({});
+  
   const { transactions, isLoading, error } = useTransactions();
+  const { accounts, isLoading: isLoadingAccounts } = useAccounts();
+  const { categories, isLoading: isLoadingCategories } = useCategories();
   const insets = useSafeAreaInsets();
 
   const handleBackPress = () => {
@@ -21,11 +34,33 @@ export default function AllTransactionsScreen() {
   };
 
   const handleFilterPress = () => {
-    // TODO: Implementar funcionalidad de filtros
-    console.log('Filter pressed');
+    setShowFilterModal(true);
   };
 
-  if (isLoading) {
+  const handleApplyFilters = async (filters: TransactionFilters) => {
+    try {
+      setIsLoadingFiltered(true);
+      const filtered = await getTransactionsWithFilters(filters);
+      setFilteredTransactions(filtered);
+      setCurrentFilters(filters);
+      setIsFiltered(true);
+    } catch (err) {
+      console.error('Error applying filters:', err);
+    } finally {
+      setIsLoadingFiltered(false);
+    }
+  };
+
+  const handleClearFilters = () => {
+    setIsFiltered(false);
+    setFilteredTransactions([]);
+    setCurrentFilters({});
+  };
+
+  const displayTransactions = isFiltered ? filteredTransactions : transactions;
+  const displayLoading = isLoading || isLoadingFiltered;
+
+  if (displayLoading) {
     return (
       <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
         <SafeAreaView className="flex-1">
@@ -60,7 +95,7 @@ export default function AllTransactionsScreen() {
         </View>
 
         {/* Search Bar y Filter */}
-        <View className="flex-row items-center px-5 py-5 space-x-3">
+        <View className="flex-row items-center px-5 py-4">
           {/* Search Bar */}
           <TouchableOpacity
             onPress={handleSearchPress}
@@ -76,10 +111,12 @@ export default function AllTransactionsScreen() {
           {/* Filter Button */}
           <TouchableOpacity
             onPress={handleFilterPress}
-            className="w-12 h-12 rounded-full bg-zinc-50 items-center justify-center ml-2"
+            className={`w-12 h-12 rounded-full items-center justify-center ml-4 ${
+              isFiltered ? 'bg-orange-50' : 'bg-zinc-50'
+            }`}
             activeOpacity={0.7}
           >
-            <Filter size={20} color="#09090b" />
+            <Filter size={20} color={isFiltered ? "#FF8904" : "#09090b"} />
           </TouchableOpacity>
         </View>
 
@@ -94,16 +131,30 @@ export default function AllTransactionsScreen() {
 
         {/* Transactions List */}
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-          <View className="pb-8 pt-3">
+          <View className="pb-8 pt-5">
             <TransactionsList
-              transactions={transactions}
+              transactions={displayTransactions}
               showAllButton={false}
-              showTitle={false} // Ocultar el título "Recent transactions"
-              maxItems={transactions.length}
+              showTitle={false}
+              maxItems={displayTransactions.length}
               emptyStateType="all"
+              isFiltered={isFiltered}
             />
           </View>
         </ScrollView>
+
+        {/* Filter Modal */}
+        <FilterModal
+          visible={showFilterModal}
+          onClose={() => setShowFilterModal(false)}
+          onApplyFilters={handleApplyFilters}
+          onClearFilters={handleClearFilters}
+          accounts={accounts}
+          categories={categories}
+          isLoadingAccounts={isLoadingAccounts}
+          isLoadingCategories={isLoadingCategories}
+          currentFilters={currentFilters}
+        />
       </SafeAreaView>
     </View>
   );

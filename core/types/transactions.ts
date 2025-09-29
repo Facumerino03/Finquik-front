@@ -91,4 +91,5 @@ export interface TransactionsListProps {
   maxItems?: number;
   emptyStateType?: 'all' | 'incomes' | 'expenses';
   showTitle?: boolean; // Nueva prop para controlar si mostrar el título
+  isFiltered?: boolean; // Nuevo prop
 }
