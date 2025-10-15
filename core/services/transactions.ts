@@ -7,6 +7,7 @@ export interface TransactionFilters {
   endDate?: string; // formato YYYY-MM-DD
   accountId?: number;
   categoryId?: number;
+  description?: string; // Nuevo parámetro para búsqueda por descripción
 }
 
 export async function getTransactionsSummary(): Promise<TransactionsSummary> {
@@ -27,6 +28,7 @@ export async function getTransactionsWithFilters(filters: TransactionFilters = {
   if (filters.endDate) params.append('endDate', filters.endDate);
   if (filters.accountId) params.append('accountId', filters.accountId.toString());
   if (filters.categoryId) params.append('categoryId', filters.categoryId.toString());
+  if (filters.description) params.append('description', filters.description);
 
   const queryString = params.toString();
   const url = queryString ? `/api/transactions?${queryString}` : '/api/transactions';

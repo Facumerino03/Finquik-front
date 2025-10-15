@@ -54,34 +54,14 @@ export interface CreateTransactionPayload {
   iconName?: string;
 }
 
-// Respuesta paginada del backend
+// Respuesta paginada del backend - Actualizada para PageResponse
 export interface PaginatedResponse<T> {
   content: T[];
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-    sort: {
-      empty: boolean;
-      sorted: boolean;
-      unsorted: boolean;
-    };
-    offset: number;
-    paged: boolean;
-    unpaged: boolean;
-  };
-  last: boolean;
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number;
-  sort: {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
-  };
-  first: boolean;
-  numberOfElements: number;
-  empty: boolean;
+  pageNumber: number;        // Antes: number
+  pageSize: number;          // Antes: size
+  totalElements: number;     // Se mantiene igual
+  totalPages: number;        // Se mantiene igual
+  isLast: boolean;           // Antes: last
 }
 
 export interface TransactionsListProps {

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
-import { ArrowLeft, Filter, Search } from 'lucide-react-native';
-import React, { useState } from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ArrowLeft, Filter, Search, X } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FilterModal from '../components/FilterModal';
 import TransactionsList from '../components/TransactionsList';
@@ -18,19 +18,64 @@ export default function AllTransactionsScreen() {
   const [isFiltered, setIsFiltered] = useState(false);
   const [isLoadingFiltered, setIsLoadingFiltered] = useState(false);
   const [currentFilters, setCurrentFilters] = useState<TransactionFilters>({});
+  const [showSearchInput, setShowSearchInput] = useState(false);
   
   const { transactions, isLoading, error } = useTransactions();
   const { accounts, isLoading: isLoadingAccounts } = useAccounts();
   const { categories, isLoading: isLoadingCategories } = useCategories();
   const insets = useSafeAreaInsets();
 
+  // Búsqueda solo cuando cambian los filtros (no por debounce)
+  useEffect(() => {
+    if (Object.keys(currentFilters).length > 0) {
+      handleSearch();
+    } else if (!searchQuery.trim()) {
+      setIsFiltered(false);
+      setFilteredTransactions([]);
+    }
+  }, [currentFilters]);
+
   const handleBackPress = () => {
     router.back();
   };
 
   const handleSearchPress = () => {
-    // TODO: Implementar funcionalidad de búsqueda
-    console.log('Search pressed');
+    setShowSearchInput(true);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setShowSearchInput(false);
+    setIsFiltered(false);
+    setFilteredTransactions([]);
+  };
+
+  const handleSearch = async () => {
+    try {
+      setIsLoadingFiltered(true);
+      const filters: TransactionFilters = {
+        ...currentFilters,
+        ...(searchQuery.trim() && { description: searchQuery.trim() })
+      };
+      
+      const filtered = await getTransactionsWithFilters(filters);
+      setFilteredTransactions(filtered);
+      setIsFiltered(true);
+    } catch (err) {
+      console.error('Error searching transactions:', err);
+    } finally {
+      setIsLoadingFiltered(false);
+    }
+  };
+
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      handleSearch();
+    } else {
+      // Si no hay texto de búsqueda, limpiar filtros
+      setIsFiltered(false);
+      setFilteredTransactions([]);
+    }
   };
 
   const handleFilterPress = () => {
@@ -40,7 +85,12 @@ export default function AllTransactionsScreen() {
   const handleApplyFilters = async (filters: TransactionFilters) => {
     try {
       setIsLoadingFiltered(true);
-      const filtered = await getTransactionsWithFilters(filters);
+      const combinedFilters = {
+        ...filters,
+        ...(searchQuery.trim() && { description: searchQuery.trim() })
+      };
+      
+      const filtered = await getTransactionsWithFilters(combinedFilters);
       setFilteredTransactions(filtered);
       setCurrentFilters(filters);
       setIsFiltered(true);
@@ -55,6 +105,8 @@ export default function AllTransactionsScreen() {
     setIsFiltered(false);
     setFilteredTransactions([]);
     setCurrentFilters({});
+    setSearchQuery('');
+    setShowSearchInput(false);
   };
 
   const displayTransactions = isFiltered ? filteredTransactions : transactions;
@@ -97,21 +149,48 @@ export default function AllTransactionsScreen() {
         {/* Search Bar y Filter */}
         <View className="flex-row items-center px-5 py-4">
           {/* Search Bar */}
-          <TouchableOpacity
-            onPress={handleSearchPress}
-            className="flex-1 flex-row items-center bg-zinc-50 rounded-full px-4 py-3"
-            activeOpacity={0.7}
-          >
-            <Search size={20} color="#09090b" />
-            <Text className="ml-3 text-base text-zinc-400 font-geist">
-              Search
-            </Text>
-          </TouchableOpacity>
+          {showSearchInput ? (
+            <View className="flex-1 flex-row items-center bg-zinc-50 rounded-full px-4">
+              <TextInput
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search transactions..."
+                placeholderTextColor="#71717b"
+                className="flex-1 text-base font-geist text-zinc-950"
+                autoFocus={true}
+                onSubmitEditing={handleSearchSubmit}
+                returnKeyType="search"
+                onBlur={() => {
+                  if (!searchQuery.trim()) {
+                    setShowSearchInput(false);
+                  }
+                }}
+              />
+              <TouchableOpacity
+                onPress={handleClearSearch}
+                className="ml-2"
+                activeOpacity={0.7}
+              >
+                <X size={20} color="#71717b" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              onPress={handleSearchPress}
+              className="flex-1 flex-row items-center bg-zinc-50 rounded-full px-4 py-3"
+              activeOpacity={0.7}
+            >
+              <Search size={20} color="#09090b" />
+              <Text className="ml-3 text-base text-zinc-400 font-geist">
+                Search
+              </Text>
+            </TouchableOpacity>
+          )}
 
           {/* Filter Button */}
           <TouchableOpacity
             onPress={handleFilterPress}
-            className={`w-12 h-12 rounded-full items-center justify-center ml-4 ${
+            className={`w-12 h-12 rounded-full items-center justify-center ml-2 ${
               isFiltered ? 'bg-orange-50' : 'bg-zinc-50'
             }`}
             activeOpacity={0.7}
