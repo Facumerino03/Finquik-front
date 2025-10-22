@@ -218,6 +218,7 @@ export default function AllTransactionsScreen() {
               maxItems={displayTransactions.length}
               emptyStateType="all"
               isFiltered={isFiltered}
+              clickable={true} // Agregar esta línea
             />
           </View>
         </ScrollView>

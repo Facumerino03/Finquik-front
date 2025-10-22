@@ -10,6 +10,16 @@ export interface TransactionFilters {
   description?: string; // Nuevo parámetro para búsqueda por descripción
 }
 
+// Payload para editar transacción
+export interface UpdateTransactionPayload {
+  amount: number;
+  description: string;
+  transactionDate: string; // formato YYYY-MM-DD
+  accountId: number;
+  categoryId: number;
+  iconName?: string;
+}
+
 export async function getTransactionsSummary(): Promise<TransactionsSummary> {
   const { data } = await api.get<TransactionsSummary>('/api/transactions/summary');
   return data;
@@ -17,6 +27,15 @@ export async function getTransactionsSummary(): Promise<TransactionsSummary> {
 
 export async function createTransaction(transactionData: CreateTransactionPayload): Promise<void> {
   await api.post('/api/transactions', transactionData);
+}
+
+export async function updateTransaction(transactionId: number, transactionData: UpdateTransactionPayload): Promise<Transaction> {
+  const { data } = await api.put<Transaction>(`/api/transactions/${transactionId}`, transactionData);
+  return data;
+}
+
+export async function deleteTransaction(transactionId: number): Promise<void> {
+  await api.delete(`/api/transactions/${transactionId}`);
 }
 
 // Función genérica para obtener transacciones con filtros
@@ -51,4 +70,9 @@ export async function getIncomeTransactions(): Promise<Transaction[]> {
 export async function getExpenseTransactions(): Promise<Transaction[]> {
   const { data } = await api.get<PaginatedResponse<Transaction>>('/api/transactions?type=EXPENSE');
   return data.content; // Extraer solo el array de transacciones
+}
+
+export async function getTransactionById(transactionId: number): Promise<Transaction> {
+  const { data } = await api.get<Transaction>(`/api/transactions/${transactionId}`);
+  return data;
 }

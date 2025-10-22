@@ -1,8 +1,9 @@
 import { ArrowBigDown, ArrowBigUp } from 'lucide-react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { TransactionsListProps } from '../core/types/transactions';
+import { Transaction, TransactionsListProps } from '../core/types/transactions';
 import EmptyState from './EmptyState';
+import TransactionDetailsModal from './TransactionDetailsModal';
 
 const TransactionsList: React.FC<TransactionsListProps> = ({
   transactions,
@@ -11,8 +12,13 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   maxItems = 4,
   emptyStateType = 'all',
   showTitle = true,
-  isFiltered = false // Nuevo prop
+  isFiltered = false,
+  clickable = false, // Nuevo prop para hacer las transacciones clickeables
+  onTransactionPress // Nuevo prop para manejar el click
 }) => {
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
   const displayTransactions = transactions.slice(0, maxItems);
 
   const formatCurrency = (amount: number) => {
@@ -59,62 +65,127 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
     return type === 'INCOME' ? '+' : '-';
   };
 
-  return (
-    <View className="bg-white px-5">
-      {/* Header - Solo mostrar si showTitle es true */}
-      {showTitle && (
-        <View 
-          className="flex-row justify-between items-center"
-          style={{ marginBottom: 24 }}
-        >
-          <Text className="text-zinc-950 text-2xl font-geist-semibold">
-            Recent transactions
+  const handleTransactionPress = (transaction: Transaction) => {
+    if (clickable) {
+      setSelectedTransaction(transaction);
+      setModalVisible(true);
+    }
+    if (onTransactionPress) {
+      onTransactionPress(transaction);
+    }
+  };
+
+  const handleEditTransaction = (transaction: Transaction) => {
+    // TODO: Implementar navegación a pantalla de edición
+    console.log('Edit transaction:', transaction);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedTransaction(null);
+  };
+
+  const TransactionItem = ({ transaction, index }: { transaction: Transaction; index: number }) => {
+    const content = (
+      <>
+        {/* Left side: Icon and Description/Date */}
+        <View className="flex-row items-center flex-1">
+          {getTransactionIcon(transaction.category.type)}
+          <View className="ml-4 flex-1">
+            <Text className="text-zinc-950 text-lg font-geist-medium">
+              {transaction.description}
+            </Text>
+            <Text className="text-zinc-500 text-base font-geist">
+              {formatDate(transaction.transactionDate)}
+            </Text>
+          </View>
+        </View>
+
+        {/* Right side: Amount */}
+        <View className="items-end">
+          <Text className={`text-lg font-geist-bold ${getAmountColor(transaction.category.type)}`}>
+            {getAmountPrefix(transaction.category.type)}{formatCurrency(transaction.amount)}
           </Text>
-          {showAllButton && (
-            <TouchableOpacity onPress={onSeeAllPress} activeOpacity={0.7}>
-              <Text className="text-zinc-500 text-base font-geist-medium">
-                See all
-              </Text>
-            </TouchableOpacity>
+        </View>
+      </>
+    );
+
+    if (clickable) {
+      return (
+        <TouchableOpacity
+          key={transaction.id}
+          onPress={() => handleTransactionPress(transaction)}
+          className="flex-row items-center justify-between"
+          style={{ 
+            marginBottom: index === displayTransactions.length - 1 ? 0 : 15,
+            paddingVertical: 8,
+          }}
+          activeOpacity={0.7}
+        >
+          {content}
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <View 
+        key={transaction.id}
+        className="flex-row items-center justify-between"
+        style={{ marginBottom: index === displayTransactions.length - 1 ? 0 : 15 }}
+      >
+        {content}
+      </View>
+    );
+  };
+
+  return (
+    <>
+      <View className="bg-white px-5">
+        {/* Header - Solo mostrar si showTitle es true */}
+        {showTitle && (
+          <View 
+            className="flex-row justify-between items-center"
+            style={{ marginBottom: 24 }}
+          >
+            <Text className="text-zinc-950 text-2xl font-geist-semibold">
+              Recent transactions
+            </Text>
+            {showAllButton && (
+              <TouchableOpacity onPress={onSeeAllPress} activeOpacity={0.7}>
+                <Text className="text-zinc-500 text-base font-geist-medium">
+                  See all
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        {/* Transactions List */}
+        <View>
+          {displayTransactions.length === 0 ? (
+            <EmptyState type={emptyStateType} isFiltered={isFiltered} />
+          ) : (
+            displayTransactions.map((transaction, index) => (
+              <TransactionItem 
+                key={transaction.id}
+                transaction={transaction} 
+                index={index} 
+              />
+            ))
           )}
         </View>
-      )}
-
-      {/* Transactions List */}
-      <View>
-        {displayTransactions.length === 0 ? (
-          <EmptyState type={emptyStateType} isFiltered={isFiltered} />
-        ) : (
-          displayTransactions.map((transaction, index) => (
-            <View 
-              key={transaction.id} 
-              className="flex-row items-center justify-between"
-              style={{ marginBottom: index === displayTransactions.length - 1 ? 0 : 15 }}
-            >
-              {/* Left side: Icon and Description/Date */}
-              <View className="flex-row items-center flex-1">
-                {getTransactionIcon(transaction.category.type)}
-                <View className="ml-4 flex-1">
-                  <Text className="text-zinc-950 text-lg font-geist-medium">
-                    {transaction.description}
-                  </Text>
-                  <Text className="text-zinc-500 text-base font-geist">
-                    {formatDate(transaction.transactionDate)}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Right side: Amount */}
-              <View className="items-end">
-                <Text className={`text-lg font-geist-bold ${getAmountColor(transaction.category.type)}`}>
-                  {getAmountPrefix(transaction.category.type)}{formatCurrency(transaction.amount)}
-                </Text>
-              </View>
-            </View>
-          ))
-        )}
       </View>
-    </View>
+
+      {/* Transaction Details Modal - Solo mostrar si es clickeable */}
+      {clickable && (
+        <TransactionDetailsModal
+          visible={modalVisible}
+          transaction={selectedTransaction}
+          onClose={handleCloseModal}
+          onEdit={handleEditTransaction}
+        />
+      )}
+    </>
   );
 };
 

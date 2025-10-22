@@ -54,14 +54,34 @@ export interface CreateTransactionPayload {
   iconName?: string;
 }
 
-// Respuesta paginada del backend - Actualizada para PageResponse
+// Respuesta paginada del backend
 export interface PaginatedResponse<T> {
   content: T[];
-  pageNumber: number;        // Antes: number
-  pageSize: number;          // Antes: size
-  totalElements: number;     // Se mantiene igual
-  totalPages: number;        // Se mantiene igual
-  isLast: boolean;           // Antes: last
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      sorted: boolean;
+      unsorted: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  last: boolean;
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  first: boolean;
+  numberOfElements: number;
+  empty: boolean;
 }
 
 export interface TransactionsListProps {
@@ -70,6 +90,8 @@ export interface TransactionsListProps {
   onSeeAllPress?: () => void;
   maxItems?: number;
   emptyStateType?: 'all' | 'incomes' | 'expenses';
-  showTitle?: boolean; // Nueva prop para controlar si mostrar el título
-  isFiltered?: boolean; // Nuevo prop
+  showTitle?: boolean;
+  isFiltered?: boolean;
+  clickable?: boolean; // Nuevo prop para hacer las transacciones clickeables
+  onTransactionPress?: (transaction: Transaction) => void; // Nuevo prop para manejar el click
 }

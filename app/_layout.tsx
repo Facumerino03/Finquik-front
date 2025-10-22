@@ -36,10 +36,8 @@ export default function Layout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen 
-            name="all-transactions" 
-            options={{ headerShown: false }} 
-          />
+          <Stack.Screen name="all-transactions" options={{ headerShown: false }} />
+          <Stack.Screen name="edit-transaction" options={{ headerShown: false }} />
         </Stack>
       </TransactionsProvider>
     </AuthProvider>
