@@ -1,15 +1,18 @@
 import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import CategoriesList from '../../components/CategoriesList';
 import CategoryChart from '../../components/CategoryChart';
 import Header from '../../components/Header';
 import TransactionsList from '../../components/TransactionsList';
 import { useCategoryData } from '../../core/hooks/useCategoryData';
 import { useTransactions } from '../../core/hooks/useTransactions';
+import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary';
 
 export default function ExpensesScreen() {
   const { expenseTransactions, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
   const { categoryData, isLoading: categoriesLoading, error: categoriesError } = useCategoryData('EXPENSE', expenseTransactions);
+  const { totalExpenses } = useTransactionsSummary();
 
   const handleSeeAllPress = () => {
     router.push('/all-transactions');
@@ -39,11 +42,10 @@ export default function ExpensesScreen() {
             categories={categoryData}
             size={320}
             strokeWidth={30}
-            color="#fb2c36" // Color rojo para expenses
+            color="#fb2c36"
           />
         </View>
         
-        {/* Mostrar error si hay problemas */}
         {error && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
@@ -58,6 +60,15 @@ export default function ExpensesScreen() {
             onSeeAllPress={handleSeeAllPress}
             maxItems={10}
             emptyStateType="expenses"
+          />
+        </View>
+
+        {/* Categories List */}
+        <View style={styles.categoriesContainer}>
+          <CategoriesList
+            categories={categoryData}
+            totalAmount={totalExpenses}
+            type="EXPENSE"
           />
         </View>
       </ScrollView>
@@ -103,8 +114,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
   },
+  categoriesContainer: {
+    marginTop: 30,
+  },
   transactionsContainer: {
     marginTop: 30,
-    marginBottom: 100, // Espacio para la barra de navegación flotante
+    marginBottom: 5,
   },
 });
