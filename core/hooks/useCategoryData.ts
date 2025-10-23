@@ -6,6 +6,7 @@ import { Category, Transaction } from '../types/transactions';
 interface CategoryData {
   category: Category;
   amount: number;
+  transactionCount: number; // Agregar esta línea
 }
 
 export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transaction[]) {
@@ -57,7 +58,8 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
 
       return {
         category,
-        amount: totalAmount
+        amount: totalAmount,
+        transactionCount: categoryTransactions.length // Agregar esta línea
       };
     }).filter(item => item.amount > 0); // Solo mostrar categorías con transacciones
 

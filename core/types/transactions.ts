@@ -32,6 +32,7 @@ export interface Category {
   id: number;
   name: string;
   type: 'INCOME' | 'EXPENSE';
+  iconName?: string | null;
 }
 
 export interface Account {
