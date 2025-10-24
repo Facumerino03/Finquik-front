@@ -1,7 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
-import { ArrowLeft, Pencil } from 'lucide-react-native';
+import { ArrowLeft, ChevronDown, Pencil, Plus } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,6 +14,8 @@ import {
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AccountSelectorModal from '../../components/AccountSelectorModal';
+import CategoryIcon from '../../components/CategoryIcon';
 import { useAuth } from '../../core/contexts/AuthContext';
 import { useAccounts } from '../../core/hooks/useAccounts';
 import { useCreateTransaction } from '../../core/hooks/useCreateTransaction';
@@ -30,6 +31,7 @@ export default function AddTransactionScreen() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   const { userToken, isLoading: authLoading } = useAuth();
   const { accounts, isLoading: accountsLoading } = useAccounts();
@@ -56,6 +58,13 @@ export default function AddTransactionScreen() {
 
     loadCategories();
   }, [selectedType, userToken]);
+
+  // Seleccionar la primera cuenta por defecto
+  useEffect(() => {
+    if (accounts.length > 0 && selectedAccountId === null) {
+      setSelectedAccountId(accounts[0].id);
+    }
+  }, [accounts]);
 
   const handleBackPress = () => {
     router.back();
@@ -91,6 +100,33 @@ export default function AddTransactionScreen() {
     setAmount(cleanedText);
   };
 
+  const handleAddCategory = () => {
+    Alert.alert('Add Category', 'Feature coming soon!');
+  };
+
+  const handleCreateAccount = () => {
+    Alert.alert('Create Account', 'Feature coming soon!');
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  const getSelectedAccountName = () => {
+    const account = accounts.find(acc => acc.id === selectedAccountId);
+    return account ? account.name : 'Select account';
+  };
+
+  const getSelectedAccountBalance = () => {
+    const account = accounts.find(acc => acc.id === selectedAccountId);
+    return account ? formatCurrency(account.currentBalance) : '';
+  };
+
   const handleSubmit = async () => {
     if (!amount || !selectedCategoryId || !selectedAccountId) {
       Alert.alert('Error', 'Please fill in all fields');
@@ -119,7 +155,7 @@ export default function AddTransactionScreen() {
             // Reset form
             setAmount('');
             setSelectedDate(new Date());
-            setSelectedAccountId(null);
+            setSelectedAccountId(accounts.length > 0 ? accounts[0].id : null);
             setSelectedCategoryId(null);
             router.back();
           },
@@ -164,9 +200,10 @@ export default function AddTransactionScreen() {
           <View className="w-10" />
         </View>
 
-        {/* Form */}
-        <ScrollView className="flex-1 px-5" showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <View className="space-y-6">
+        {/* Content */}
+        <View className="flex-1" style={{ paddingBottom: insets.bottom + 100 }}>
+          {/* Top Section - Type Toggle, Amount and Date */}
+          <View className="px-5">
             {/* Type Toggle */}
             <View className="items-center mt-6 mb-4">
               <View className="flex-row bg-zinc-50 rounded-full p-1" style={{ gap: 4 }}>
@@ -205,7 +242,7 @@ export default function AddTransactionScreen() {
             </View>
 
             {/* Amount Display */}
-            <View className="items-center py-6">
+            <View className="items-center py-12">
               <View className="flex-row items-center justify-center" style={{ alignItems: 'baseline' }}>
                 <Text 
                   className="text-6xl font-geist-bold"
@@ -237,7 +274,7 @@ export default function AddTransactionScreen() {
               {/* Date with Edit Icon */}
               <TouchableOpacity
                 onPress={() => setShowDatePicker(true)}
-                className="flex-row items-center mt-4"
+                className="flex-row items-center mt-6"
                 activeOpacity={0.7}
               >
                 <Text className="text-lg font-geist text-zinc-500">
@@ -246,61 +283,120 @@ export default function AddTransactionScreen() {
                 <Pencil size={18} color="#71717a" style={{ marginLeft: 8 }} />
               </TouchableOpacity>
             </View>
-
-            {/* Account */}
-            <View className="mt-8">
-              <Text className="text-lg font-geist-semibold text-zinc-950 mb-3">
-                Account
-              </Text>
-              <View className="bg-zinc-50 rounded-lg">
-                <Picker
-                  selectedValue={selectedAccountId}
-                  onValueChange={(value) => setSelectedAccountId(value)}
-                  style={{ height: 50 }}
-                >
-                  <Picker.Item label="Select" value={null} color="#71717b" />
-                  {accounts.map((account) => (
-                    <Picker.Item
-                      key={account.id}
-                      label={account.name}
-                      value={account.id}
-                    />
-                  ))}
-                </Picker>
-              </View>
-            </View>
-
-            {/* Category */}
-            <View>
-              <Text className="text-lg font-geist-semibold text-zinc-950 mb-3">
-                Category
-              </Text>
-              <View className="bg-zinc-50 rounded-lg">
-                <Picker
-                  selectedValue={selectedCategoryId}
-                  onValueChange={(value) => setSelectedCategoryId(value)}
-                  style={{ height: 50 }}
-                  enabled={!isLoadingCategories}
-                >
-                  <Picker.Item 
-                    label={isLoadingCategories ? "Loading..." : "Select"} 
-                    value={null} 
-                    color="#71717b" 
-                  />
-                  {categories.map((category) => (
-                    <Picker.Item
-                      key={category.id}
-                      label={category.name}
-                      value={category.id}
-                    />
-                  ))}
-                </Picker>
-              </View>
-            </View>
           </View>
 
-          {/* Submit Button */}
-          <View className="py-8">
+          {/* Spacer */}
+          <View className="flex-1" />
+
+          {/* Bottom Section - Account, Category and Submit */}
+          <View className="px-5 pb-8">
+            {/* Account Card */}
+            <View className="mb-6">
+              {accounts.length > 0 ? (
+                <TouchableOpacity
+                  onPress={() => setShowAccountModal(true)}
+                  className="flex-row items-center justify-between bg-zinc-50 rounded-2xl px-4 py-4"
+                  activeOpacity={0.7}
+                >
+                  <View className="flex-1 flex-row items-center">
+                    {/* Circle */}
+                    <View 
+                      className="rounded-full bg-zinc-300"
+                      style={{ 
+                        width: 40, 
+                        height: 40,
+                      }}
+                    />
+
+                    {/* Account Name and Balance */}
+                    <View className="ml-3 flex-1">
+                      <Text className="text-base font-geist-semibold text-zinc-950" numberOfLines={1}>
+                        {getSelectedAccountName()}
+                      </Text>
+                      <Text className="text-lg font-geist-bold text-zinc-950 mt-1">
+                        {getSelectedAccountBalance()}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Dropdown Arrow */}
+                  <ChevronDown size={24} color="#09090b" />
+                </TouchableOpacity>
+              ) : (
+                <View className="bg-zinc-50 rounded-2xl px-4 py-6 items-center">
+                  <Text className="text-base font-geist text-zinc-500">
+                    No accounts available
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* Category Pills */}
+            <View className="mb-6">
+              {isLoadingCategories ? (
+                <View className="py-4 items-center">
+                  <ActivityIndicator size="small" color="#09090b" />
+                </View>
+              ) : (
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ paddingVertical: 8 }}
+                >
+                  {/* Add Category Button */}
+                  <TouchableOpacity
+                    onPress={handleAddCategory}
+                    className="w-14 h-14 rounded-full bg-zinc-100 items-center justify-center mr-2"
+                    activeOpacity={0.7}
+                  >
+                    <Plus size={24} color="#09090b" />
+                  </TouchableOpacity>
+
+                  {/* Category Pills */}
+                  {categories.map((category) => (
+                    <TouchableOpacity
+                      key={category.id}
+                      onPress={() => setSelectedCategoryId(category.id)}
+                      className={`flex-row items-center pl-2 pr-4 py-2 rounded-full mr-2 ${
+                        selectedCategoryId === category.id
+                          ? 'bg-zinc-950'
+                          : 'bg-white border border-zinc-200'
+                      }`}
+                      activeOpacity={0.7}
+                      style={{ height: 48 }}
+                    >
+                      {/* Icon Container */}
+                      <View 
+                        className="rounded-full items-center justify-center mr-3"
+                        style={{ 
+                          width: 32,
+                          height: 32,
+                          backgroundColor: selectedCategoryId === category.id ? '#ffffff' : '#f4f4f5'
+                        }}
+                      >
+                        <CategoryIcon
+                          iconName={category.iconName}
+                          size={16}
+                        />
+                      </View>
+                      
+                      {/* Category Name */}
+                      <Text 
+                        className={`text-base font-geist-medium ${
+                          selectedCategoryId === category.id
+                            ? 'text-white'
+                            : 'text-zinc-950'
+                        }`}
+                      >
+                        {category.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+
+            {/* Submit Button */}
             <TouchableOpacity
               onPress={handleSubmit}
               disabled={
@@ -333,8 +429,18 @@ export default function AddTransactionScreen() {
               )}
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </SafeAreaView>
+
+      {/* Account Selector Modal */}
+      <AccountSelectorModal
+        visible={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+        accounts={accounts}
+        selectedAccountId={selectedAccountId}
+        onSelectAccount={setSelectedAccountId}
+        onCreateAccount={handleCreateAccount}
+      />
 
       {/* Date Picker */}
       {showDatePicker && (
