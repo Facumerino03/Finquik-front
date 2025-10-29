@@ -33,6 +33,7 @@ export interface Category {
   name: string;
   type: 'INCOME' | 'EXPENSE';
   iconName?: string | null;
+  iconColor?: string | null; // Agregar esta línea
 }
 
 export interface Account {

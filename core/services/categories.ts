@@ -10,3 +10,15 @@ export async function getCategoriesByType(type: 'INCOME' | 'EXPENSE'): Promise<C
   const { data } = await api.get<Category[]>(`/api/categories?type=${type}`);
   return data;
 }
+
+export interface CreateCategoryPayload {
+  name: string;
+  type: 'INCOME' | 'EXPENSE';
+  iconName?: string;
+  iconColor?: string;
+}
+
+export async function createCategory(categoryData: CreateCategoryPayload): Promise<Category> {
+  const { data } = await api.post<Category>('/api/categories', categoryData);
+  return data;
+}

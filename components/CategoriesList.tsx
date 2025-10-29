@@ -8,6 +8,7 @@ interface CategoryData {
     name: string;
     type: 'INCOME' | 'EXPENSE';
     iconName?: string | null;
+    iconColor?: string | null;
   };
   amount: number;
   transactionCount: number;
@@ -15,7 +16,7 @@ interface CategoryData {
 
 interface CategoriesListProps {
   categories: CategoryData[];
-  totalAmount: number; // Total de todos los ingresos/gastos para calcular porcentaje
+  totalAmount: number;
   type: 'INCOME' | 'EXPENSE';
   showTitle?: boolean;
 }
@@ -52,7 +53,9 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
         <View className="flex-row items-center flex-1">
           <CategoryIcon
             iconName={categoryData.category.iconName}
-            size={22}
+            iconColor={categoryData.category.iconColor}
+            size={20}
+            containerSize={50}
           />
           <View className="ml-4 flex-1">
             <Text className="text-zinc-950 text-lg font-geist-medium">
@@ -79,7 +82,7 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
 
   return (
     <View className="bg-white px-5">
-      {/* Header - Solo mostrar si showTitle es true */}
+      {/* Header */}
       {showTitle && (
         <View 
           className="flex-row justify-between items-center"

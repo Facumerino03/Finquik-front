@@ -1,6 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
-import { ArrowLeft, ChevronDown, Pencil, Plus } from 'lucide-react-native';
+import { ArrowLeft, ChevronDown, FileText, Pencil, Plus } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -16,6 +16,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AccountSelectorModal from '../../components/AccountSelectorModal';
 import CategoryIcon from '../../components/CategoryIcon';
+import CreateCategoryModal from '../../components/CreateCategoryModal';
+import DescriptionModal from '../../components/DescriptionModal';
+import { AVAILABLE_COLORS } from '../../core/constants/availableColors';
 import { useAuth } from '../../core/contexts/AuthContext';
 import { useAccounts } from '../../core/hooks/useAccounts';
 import { useCreateTransaction } from '../../core/hooks/useCreateTransaction';
@@ -32,6 +35,9 @@ export default function AddTransactionScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [description, setDescription] = useState('');
+  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
 
   const { userToken, isLoading: authLoading } = useAuth();
   const { accounts, isLoading: accountsLoading } = useAccounts();
@@ -39,24 +45,25 @@ export default function AddTransactionScreen() {
   const insets = useSafeAreaInsets();
 
   // Cargar categorías según el tipo seleccionado
+  const loadCategories = async () => {
+    if (!userToken) return;
+
+    try {
+      setIsLoadingCategories(true);
+      const data = await getCategoriesByType(selectedType);
+      console.log('Categories loaded:', JSON.stringify(data, null, 2)); // <- AGREGAR ESTO
+      setCategories(data);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
+
   useEffect(() => {
-    const loadCategories = async () => {
-      if (!userToken) return;
-
-      try {
-        setIsLoadingCategories(true);
-        const data = await getCategoriesByType(selectedType);
-        setCategories(data);
-        // Reset category selection when type changes
-        setSelectedCategoryId(null);
-      } catch (error) {
-        console.error('Error loading categories:', error);
-      } finally {
-        setIsLoadingCategories(false);
-      }
-    };
-
     loadCategories();
+    // Reset category selection when type changes
+    setSelectedCategoryId(null);
   }, [selectedType, userToken]);
 
   // Seleccionar la primera cuenta por defecto
@@ -101,7 +108,11 @@ export default function AddTransactionScreen() {
   };
 
   const handleAddCategory = () => {
-    Alert.alert('Add Category', 'Feature coming soon!');
+    setShowCreateCategoryModal(true);
+  };
+
+  const handleCategoryCreated = () => {
+    loadCategories();
   };
 
   const handleCreateAccount = () => {
@@ -142,7 +153,7 @@ export default function AddTransactionScreen() {
     try {
       await createTransaction({
         amount: amountValue,
-        description: `${selectedType === 'INCOME' ? 'Income' : 'Expense'} transaction`,
+        description: description || `${selectedType === 'INCOME' ? 'Income' : 'Expense'} transaction`,
         transactionDate: formatDateForAPI(selectedDate),
         accountId: selectedAccountId,
         categoryId: selectedCategoryId,
@@ -157,6 +168,7 @@ export default function AddTransactionScreen() {
             setSelectedDate(new Date());
             setSelectedAccountId(accounts.length > 0 ? accounts[0].id : null);
             setSelectedCategoryId(null);
+            setDescription('');
             router.back();
           },
         },
@@ -288,8 +300,47 @@ export default function AddTransactionScreen() {
           {/* Spacer */}
           <View className="flex-1" />
 
-          {/* Bottom Section - Account, Category and Submit */}
+          {/* Bottom Section - Description, Account, Category and Submit */}
           <View className="px-5 pb-8">
+            {/* Add Note Pill */}
+            <View className="mb-6 items-center">
+              <TouchableOpacity
+                onPress={() => setShowDescriptionModal(true)}
+                className={`flex-row items-center pl-3 pr-4 py-2 rounded-full ${
+                  description 
+                    ? 'bg-zinc-950' 
+                    : 'bg-white border border-zinc-200'
+                }`}
+                activeOpacity={0.7}
+                style={{ height: 48 }}
+              >
+                {/* Icon Container */}
+                <View 
+                  className="rounded-full items-center justify-center mr-3"
+                  style={{ 
+                    width: 36,
+                    height: 36,
+                    backgroundColor: description ? '#ffffff' : '#f4f4f5'
+                  }}
+                >
+                  <FileText 
+                    size={16} 
+                    color={description ? '#09090b' : '#71717b'} 
+                  />
+                </View>
+                
+                {/* Text */}
+                <Text 
+                  className={`text-base font-geist-medium ${
+                    description ? 'text-white' : 'text-zinc-500'
+                  }`}
+                  numberOfLines={1}
+                >
+                  {description || 'Add note'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             {/* Account Card */}
             <View className="mb-6">
               {accounts.length > 0 ? (
@@ -298,6 +349,7 @@ export default function AddTransactionScreen() {
                   className="flex-row items-center justify-between bg-zinc-50 rounded-2xl px-4 py-4"
                   activeOpacity={0.7}
                 >
+
                   <View className="flex-1 flex-row items-center">
                     {/* Circle */}
                     <View 
@@ -353,45 +405,60 @@ export default function AddTransactionScreen() {
                   </TouchableOpacity>
 
                   {/* Category Pills */}
-                  {categories.map((category) => (
-                    <TouchableOpacity
-                      key={category.id}
-                      onPress={() => setSelectedCategoryId(category.id)}
-                      className={`flex-row items-center pl-2 pr-4 py-2 rounded-full mr-2 ${
-                        selectedCategoryId === category.id
-                          ? 'bg-zinc-950'
-                          : 'bg-white border border-zinc-200'
-                      }`}
-                      activeOpacity={0.7}
-                      style={{ height: 48 }}
-                    >
-                      {/* Icon Container */}
-                      <View 
-                        className="rounded-full items-center justify-center mr-3"
-                        style={{ 
-                          width: 32,
-                          height: 32,
-                          backgroundColor: selectedCategoryId === category.id ? '#ffffff' : '#f4f4f5'
-                        }}
-                      >
-                        <CategoryIcon
-                          iconName={category.iconName}
-                          size={16}
-                        />
-                      </View>
+                  {categories.map((category) => {
+                    const isSelected = selectedCategoryId === category.id;
+                    
+                    console.log('Category:', category.name, 'iconColor:', category.iconColor); // <- AGREGAR ESTO
+                    
+                    // Obtener el color de fondo del círculo del ícono desde AVAILABLE_COLORS
+                    const getIconBackgroundColor = () => {
+                      if (isSelected) return '#ffffff'; // Blanco cuando está seleccionado
                       
-                      {/* Category Name */}
-                      <Text 
-                        className={`text-base font-geist-medium ${
-                          selectedCategoryId === category.id
-                            ? 'text-white'
-                            : 'text-zinc-950'
+                      // Buscar el color en AVAILABLE_COLORS
+                      const colorConfig = AVAILABLE_COLORS.find(c => c.value === category.iconColor);
+                      console.log('Color config found:', colorConfig); // <- AGREGAR ESTO
+                      return colorConfig?.bg || '#f4f4f5'; // zinc-100 como fallback
+                    };
+                    
+                    return (
+                      <TouchableOpacity
+                        key={category.id}
+                        onPress={() => setSelectedCategoryId(category.id)}
+                        className={`flex-row items-center pl-2 pr-4 py-2 rounded-full mr-2 ${
+                          isSelected
+                            ? 'bg-zinc-950'
+                            : 'bg-white border border-zinc-200'
                         }`}
+                        activeOpacity={0.7}
+                        style={{ height: 48 }}
                       >
-                        {category.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        {/* Icon Container */}
+                        <View 
+                          className="rounded-full items-center justify-center mr-3"
+                          style={{ 
+                            width: 36,
+                            height: 36,
+                            backgroundColor: getIconBackgroundColor(),
+                          }}
+                        >
+                          <CategoryIcon
+                            iconName={category.iconName}
+                            size={16}
+                            color={category.iconColor || '#09090b'} // <- Agregar fallback
+                          />
+                        </View>
+                        
+                        {/* Category Name */}
+                        <Text 
+                          className={`text-base font-geist-medium ${
+                            isSelected ? 'text-white' : 'text-zinc-950'
+                          }`}
+                        >
+                          {category.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </ScrollView>
               )}
             </View>
@@ -431,6 +498,22 @@ export default function AddTransactionScreen() {
           </View>
         </View>
       </SafeAreaView>
+
+      {/* Create Category Modal */}
+      <CreateCategoryModal
+        visible={showCreateCategoryModal}
+        onClose={() => setShowCreateCategoryModal(false)}
+        categoryType={selectedType}
+        onCategoryCreated={handleCategoryCreated}
+      />
+
+      {/* Description Modal */}
+      <DescriptionModal
+        visible={showDescriptionModal}
+        onClose={() => setShowDescriptionModal(false)}
+        description={description}
+        onSave={setDescription}
+      />
 
       {/* Account Selector Modal */}
       <AccountSelectorModal

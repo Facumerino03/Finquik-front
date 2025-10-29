@@ -1,25 +1,46 @@
 import * as LucideIcons from 'lucide-react-native';
 import { X } from 'lucide-react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { AVAILABLE_COLORS } from '../core/constants/availableColors';
 import { AVAILABLE_ICONS } from '../core/constants/availableIcons';
 
 interface IconPickerProps {
   visible: boolean;
   onClose: () => void;
-  onSelectIcon: (iconName: string) => void;
+  onSelectIcon: (iconName: string, color: string) => void;
   selectedIcon?: string | null;
+  selectedColor?: string | null;
 }
 
 const IconPicker: React.FC<IconPickerProps> = ({
   visible,
   onClose,
   onSelectIcon,
-  selectedIcon
+  selectedIcon,
+  selectedColor
 }) => {
+  const [tempSelectedIcon, setTempSelectedIcon] = useState<string | null>(selectedIcon || null);
+  const [tempSelectedColor, setTempSelectedColor] = useState<string>(selectedColor || AVAILABLE_COLORS[0].value);
+
   const handleSelectIcon = (iconName: string) => {
-    onSelectIcon(iconName);
-    onClose();
+    setTempSelectedIcon(iconName);
+  };
+
+  const handleSelectColor = (color: string) => {
+    setTempSelectedColor(color);
+  };
+
+  const handleConfirm = () => {
+    if (tempSelectedIcon) {
+      onSelectIcon(tempSelectedIcon, tempSelectedColor);
+      onClose();
+    }
+  };
+
+  const getColorBackground = (colorValue: string) => {
+    const color = AVAILABLE_COLORS.find(c => c.value === colorValue);
+    return color ? color.bg : '#f4f4f5';
   };
 
   const renderIcon = (iconName: string) => {
@@ -27,21 +48,49 @@ const IconPicker: React.FC<IconPickerProps> = ({
     
     if (!IconComponent) return null;
 
-    const isSelected = selectedIcon === iconName;
+    const isSelected = tempSelectedIcon === iconName;
 
     return (
       <TouchableOpacity
         key={iconName}
         onPress={() => handleSelectIcon(iconName)}
-        className={`w-16 h-16 items-center justify-center rounded-xl m-2 ${
-          isSelected ? 'bg-zinc-950' : 'bg-zinc-100'
-        }`}
+        className="items-center justify-center rounded-2xl"
+        style={{
+          width: 52,
+          height: 52,
+          margin: 4,
+          backgroundColor: isSelected ? getColorBackground(tempSelectedColor) : 'transparent',
+        }}
         activeOpacity={0.7}
       >
         <IconComponent 
-          size={28} 
-          color={isSelected ? '#ffffff' : '#09090b'} 
+          size={26} 
+          color={isSelected ? tempSelectedColor : '#71717a'} 
         />
+      </TouchableOpacity>
+    );
+  };
+
+  const renderColorOption = (color: typeof AVAILABLE_COLORS[number]) => {
+    const isSelected = tempSelectedColor === color.value;
+
+    return (
+      <TouchableOpacity
+        key={color.name}
+        onPress={() => handleSelectColor(color.value)}
+        className="items-center justify-center rounded-full mx-1.5"
+        style={{
+          width: 44,
+          height: 44,
+          backgroundColor: color.value,
+          borderWidth: isSelected ? 3 : 0,
+          borderColor: '#ffffff',
+        }}
+        activeOpacity={0.8}
+      >
+        {isSelected && (
+          <View className="w-2 h-2 bg-white rounded-full" />
+        )}
       </TouchableOpacity>
     );
   };
@@ -54,33 +103,66 @@ const IconPicker: React.FC<IconPickerProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end bg-black/50">
-        <View className="bg-white rounded-t-3xl" style={{ height: '70%' }}>
+        <View className="bg-white rounded-t-3xl" style={{ height: '85%' }}>
           {/* Header */}
-          <View className="flex-row items-center justify-between px-6 pt-8 pb-4 border-b border-zinc-200">
-            <Text className="text-2xl font-geist-semibold text-zinc-950">
-              Select Icon
-            </Text>
-            <TouchableOpacity
-              onPress={onClose}
-              className="w-10 h-10 items-center justify-center rounded-full bg-zinc-100"
-              activeOpacity={0.7}
-            >
-              <X size={20} color="#09090b" />
-            </TouchableOpacity>
+          <View className="px-6 pt-8 pb-4">
+            <View className="flex-row items-center justify-between mb-6">
+              <Text className="text-2xl font-geist-semibold text-zinc-950">
+                Select Icon
+              </Text>
+              <TouchableOpacity
+                onPress={onClose}
+                className="w-10 h-10 items-center justify-center rounded-full bg-zinc-100"
+                activeOpacity={0.7}
+              >
+                <X size={20} color="#09090b" />
+              </TouchableOpacity>
+            </View>
           </View>
+
+          {/* Color Selector */}
+          <View className="px-6 pb-4">
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingVertical: 8 }}
+            >
+              {AVAILABLE_COLORS.map(renderColorOption)}
+            </ScrollView>
+          </View>
+
+          <View className="h-px bg-zinc-200 mx-6" />
 
           {/* Icons Grid */}
           <ScrollView 
-            className="flex-1 px-4 py-4" 
+            className="flex-1 pt-4" 
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
           >
-            <View className="flex-row flex-wrap justify-start">
+            <View className="flex-row flex-wrap justify-between">
               {AVAILABLE_ICONS.map(renderIcon)}
             </View>
             
-            {/* Espaciado inferior para que no quede cortado el último item */}
-            <View style={{ height: 20 }} />
+            <View style={{ height: 100 }} />
           </ScrollView>
+
+          {/* Confirm Button */}
+          <View className="px-6 pb-8 pt-4 bg-white border-t border-zinc-200">
+            <TouchableOpacity
+              onPress={handleConfirm}
+              disabled={!tempSelectedIcon}
+              className={`py-4 rounded-2xl items-center ${
+                tempSelectedIcon ? 'bg-zinc-950' : 'bg-zinc-200'
+              }`}
+              activeOpacity={0.8}
+            >
+              <Text className={`text-lg font-geist-semibold ${
+                tempSelectedIcon ? 'text-white' : 'text-zinc-400'
+              }`}>
+                Confirm
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
