@@ -6,7 +6,7 @@ import { Category, Transaction } from '../types/transactions';
 interface CategoryData {
   category: Category;
   amount: number;
-  transactionCount: number; // Agregar esta línea
+  transactionCount: number;
 }
 
 export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transaction[]) {
@@ -41,7 +41,7 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
 
   // Calcular montos por categoría cuando cambien las transacciones o categorías
   useEffect(() => {
-    if (categories.length === 0 || transactions.length === 0) {
+    if (categories.length === 0) {
       setCategoryData([]);
       return;
     }
@@ -59,12 +59,22 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
       return {
         category,
         amount: totalAmount,
-        transactionCount: categoryTransactions.length // Agregar esta línea
+        transactionCount: categoryTransactions.length
       };
-    }).filter(item => item.amount > 0); // Solo mostrar categorías con transacciones
+    }); // Removido el .filter(item => item.amount > 0)
 
-    // Ordenar por monto descendente
-    data.sort((a, b) => b.amount - a.amount);
+    // Ordenar: primero las que tienen transacciones (por monto descendente), luego las vacías
+    data.sort((a, b) => {
+      // Si ambas tienen transacciones, ordenar por monto
+      if (a.amount > 0 && b.amount > 0) {
+        return b.amount - a.amount;
+      }
+      // Las que tienen transacciones van primero
+      if (a.amount > 0) return -1;
+      if (b.amount > 0) return 1;
+      // Si ambas están vacías, ordenar alfabéticamente
+      return a.category.name.localeCompare(b.category.name);
+    });
 
     setCategoryData(data);
   }, [categories, transactions]);
@@ -76,7 +86,13 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
     refresh: () => {
       if (userToken) {
         setIsLoading(true);
-        fetchCategories();
+        getCategoriesByType(type).then(data => {
+          setCategories(data);
+          setIsLoading(false);
+        }).catch(err => {
+          setError('Failed to load categories');
+          setIsLoading(false);
+        });
       }
     }
   };

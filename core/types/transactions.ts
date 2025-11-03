@@ -39,11 +39,13 @@ export interface Category {
 export interface Account {
   id: number;
   name: string;
-  type: 'BANK_ACCOUNT' | 'CASH' | 'CREDIT_CARD';
+  type: string;
   currentBalance: number;
   currency: string;
   createdAt: string;
   updatedAt: string;
+  iconName?: string;
+  iconColor?: string;
 }
 
 // Payload para crear transacción
@@ -54,6 +56,27 @@ export interface CreateTransactionPayload {
   accountId: number;
   categoryId: number;
   iconName?: string;
+}
+
+// Payload para crear cuenta
+export interface CreateAccountPayload {
+  name: string;
+  type: string;
+  initialBalance: number; // Cambiado de currentBalance a initialBalance
+  currency: string;
+  iconName?: string;
+  iconColor?: string;
+}
+
+// Payload para actualizar cuenta
+export interface UpdateAccountPayload {
+  name: string;
+  type: string;
+  initialBalance: number; // Agregado initialBalance
+  currentBalance: number; // Mantenemos currentBalance también
+  currency: string;
+  iconName?: string;
+  iconColor?: string;
 }
 
 // Respuesta paginada del backend

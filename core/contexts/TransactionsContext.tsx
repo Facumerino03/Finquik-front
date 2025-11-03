@@ -1,12 +1,13 @@
 import React, {
-    createContext,
-    ReactNode,
-    useContext,
-    useEffect,
-    useState,
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
 } from "react";
+import { getAllAccounts } from "../services/accounts";
 import { getAllTransactions, getExpenseTransactions, getIncomeTransactions, getTransactionsSummary } from "../services/transactions";
-import { Transaction } from "../types/transactions";
+import { Account, Transaction } from "../types/transactions";
 import { useAuth } from "./AuthContext";
 
 interface TransactionsContextType {
@@ -14,6 +15,7 @@ interface TransactionsContextType {
   transactions: Transaction[];
   incomeTransactions: Transaction[];
   expenseTransactions: Transaction[];
+  accounts: Account[];
   totalIncome: number;
   totalExpenses: number;
   balance: number;
@@ -24,6 +26,7 @@ interface TransactionsContextType {
   
   // Acciones
   refresh: () => Promise<void>;
+  refreshAccounts: () => Promise<void>;
 }
 
 const TransactionsContext = createContext<TransactionsContextType | undefined>(undefined);
@@ -36,6 +39,7 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [incomeTransactions, setIncomeTransactions] = useState<Transaction[]>([]);
   const [expenseTransactions, setExpenseTransactions] = useState<Transaction[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [balance, setBalance] = useState(0);
@@ -73,6 +77,19 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
     }
   };
 
+  const fetchAccounts = async () => {
+    if (!userToken) {
+      return;
+    }
+
+    try {
+      const accountsData = await getAllAccounts();
+      setAccounts(accountsData);
+    } catch (err) {
+      console.error('fetchAccounts error:', err);
+    }
+  };
+
   const fetchSummary = async () => {
     if (!userToken) {
       return;
@@ -94,8 +111,12 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
 
   const refresh = async () => {
     setIsLoading(true);
-    await Promise.all([fetchTransactions(), fetchSummary()]);
+    await Promise.all([fetchTransactions(), fetchAccounts(), fetchSummary()]);
     setIsLoading(false);
+  };
+
+  const refreshAccounts = async () => {
+    await fetchAccounts();
   };
 
   useEffect(() => {
@@ -112,12 +133,14 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
         transactions,
         incomeTransactions,
         expenseTransactions,
+        accounts,
         totalIncome,
         totalExpenses,
         balance,
         isLoading,
         error,
-        refresh
+        refresh,
+        refreshAccounts
       }}
     >
       {children}

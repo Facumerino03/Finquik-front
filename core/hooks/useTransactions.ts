@@ -11,9 +11,11 @@ export function useTransactions() {
     transactions: context.transactions,
     incomeTransactions: context.incomeTransactions,
     expenseTransactions: context.expenseTransactions,
+    accounts: context.accounts,
     recentTransactions: getRecentTransactions(),
     isLoading: context.isLoading,
     error: context.error,
     refresh: context.refresh,
+    refreshAccounts: context.refreshAccounts,
   };
 }
