@@ -1,4 +1,4 @@
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../core/contexts/AuthContext';
@@ -41,11 +41,9 @@ export default function LoginScreen() {
         </Text>
         <View className="flex-row justify-center mt-2">
           <Text className="text-zinc-950 font-geist">Don't have an account? </Text>
-          <Link href="/(auth)/register" asChild>
-            <TouchableOpacity>
-              <Text className="text-zinc-950 font-geist-semibold underline">Create one</Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity onPress={() => router.replace('/(auth)/register')}>
+            <Text className="text-zinc-950 font-geist-semibold underline">Create one</Text>
+          </TouchableOpacity>
         </View>
       </View>
 

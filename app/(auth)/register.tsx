@@ -51,11 +51,9 @@ export default function RegisterScreen() {
         </Text>
         <View className="flex-row justify-center mt-2">
           <Text className="text-zinc-950 font-geist">Already have an account? </Text>
-          <Link href="/(auth)/login" asChild>
-            <TouchableOpacity>
-              <Text className="text-zinc-950 font-geist-semibold underline">Sign in</Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity onPress={() => router.replace('/(auth)/login')}>
+            <Text className="text-zinc-950 font-geist-semibold underline">Sign in</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
