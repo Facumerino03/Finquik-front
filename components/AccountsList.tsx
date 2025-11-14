@@ -2,6 +2,7 @@ import { ChevronRight, Plus } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Account } from '../core/types/transactions';
+import CategoryIcon from './CategoryIcon';
 import CreateAccountModal from './CreateAccountModal';
 import EditAccountModal from './EditAccountModal';
 
@@ -36,18 +37,26 @@ export default function AccountsList({ accounts, totalBalance }: AccountsListPro
       activeOpacity={0.7}
     >
       <View className="flex-row items-center flex-1">
-        {/* Circle with account color */}
-        <View
-          className="rounded-full"
-          style={{
-            width: 48,
-            height: 48,
-            backgroundColor: account.iconColor || '#71717a',
-          }}
-        />
+        {/* Icon with account color - usando la misma lógica que CategoriesList */}
+        {account.iconName && account.iconColor ? (
+          <CategoryIcon
+            iconName={account.iconName}
+            iconColor={account.iconColor}
+            size={24}
+            containerSize={56}
+          />
+        ) : (
+          // Fallback: círculo con color sólido si no hay icono
+          <View
+            className="w-14 h-14 rounded-full"
+            style={{
+              backgroundColor: account.iconColor || '#71717a',
+            }}
+          />
+        )}
 
         {/* Account Info */}
-        <View className="ml-3 flex-1">
+        <View className="ml-4 flex-1">
           <Text 
             className="text-base font-geist-semibold text-zinc-950 mb-1"
             numberOfLines={1}
