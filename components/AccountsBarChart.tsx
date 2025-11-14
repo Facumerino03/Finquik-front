@@ -22,7 +22,7 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
   
   const gapWidth = 8;
   const borderRadius = 50;
-  const minSegmentWidth = 20; // Ancho mínimo para cada segmento
+  const minSegmentWidth = 20;
   
   const calculateSegments = () => {
     if (totalBalance === 0 || accounts.length === 0) return [];
@@ -30,60 +30,50 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
     const totalGaps = gapWidth * (accounts.length - 1);
     const availableWidth = width - totalGaps;
     
-    // Calcular anchos proporcionales
     const proportionalWidths = accounts.map(account => 
       (account.currentBalance / totalBalance) * availableWidth
     );
     
-    // Identificar segmentos que necesitan ancho mínimo
-    const needsMinWidth = proportionalWidths.map(w => w < minSegmentWidth);
-    const countNeedsMin = needsMinWidth.filter(Boolean).length;
+    const isSmall = proportionalWidths.map(w => w < minSegmentWidth);
+    const smallCount = isSmall.filter(Boolean).length;
     
-    // Si hay segmentos muy pequeños, ajustar
-    let adjustedWidths: number[];
-    
-    if (countNeedsMin > 0) {
-      // Calcular espacio extra necesario para los segmentos pequeños
-      const totalMinWidth = countNeedsMin * minSegmentWidth;
-      const totalCurrentSmallWidth = proportionalWidths
-        .filter((w, i) => needsMinWidth[i])
-        .reduce((sum, w) => sum + w, 0);
-      
-      const extraSpaceNeeded = totalMinWidth - totalCurrentSmallWidth;
-      
-      // Distribuir el espacio extra entre los segmentos grandes
-      const largeSegmentsIndices = needsMinWidth
-        .map((needs, i) => needs ? -1 : i)
-        .filter(i => i >= 0);
-      
-      if (largeSegmentsIndices.length > 0) {
-        const reductionPerLarge = extraSpaceNeeded / largeSegmentsIndices.length;
+    if (smallCount === 0) {
+      let currentX = 0;
+      return accounts.map((account, index) => {
+        const segmentWidth = proportionalWidths[index];
+        const startX = currentX;
+        const endX = currentX + segmentWidth;
         
-        adjustedWidths = proportionalWidths.map((w, i) => {
-          if (needsMinWidth[i]) {
-            return minSegmentWidth;
-          } else {
-            return Math.max(minSegmentWidth, w - reductionPerLarge);
-          }
-        });
-      } else {
-        // Si todos son pequeños, distribuir equitativamente
-        adjustedWidths = accounts.map(() => availableWidth / accounts.length);
-      }
-    } else {
-      adjustedWidths = proportionalWidths;
+        currentX = endX + gapWidth;
+        
+        return {
+          account,
+          startX,
+          endX,
+          width: segmentWidth,
+          index
+        };
+      });
     }
     
-    // Normalizar para que sume exactamente availableWidth
-    const totalAdjusted = adjustedWidths.reduce((sum, w) => sum + w, 0);
-    const normalizedWidths = adjustedWidths.map(w => 
-      (w / totalAdjusted) * availableWidth
-    );
+    const spaceUsedBySmall = smallCount * minSegmentWidth;
+    const spaceForLarge = availableWidth - spaceUsedBySmall;
     
-    // Construir segmentos
+    const largeBalance = accounts.reduce((sum, account, i) => {
+      return isSmall[i] ? sum : sum + account.currentBalance;
+    }, 0);
+    
+    const finalWidths = accounts.map((account, i) => {
+      if (isSmall[i]) {
+        return minSegmentWidth;
+      } else {
+        return (account.currentBalance / largeBalance) * spaceForLarge;
+      }
+    });
+    
     let currentX = 0;
     return accounts.map((account, index) => {
-      const segmentWidth = normalizedWidths[index];
+      const segmentWidth = finalWidths[index];
       const startX = currentX;
       const endX = currentX + segmentWidth;
       
@@ -158,11 +148,10 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
   };
 
   const createRoundedRectPath = (x: number, y: number, width: number, height: number, radius: number, isFirst: boolean, isLast: boolean) => {
-    const r = height / 2; // Radio completo para forma de píldora
-    const rMiddle = 5; // Radio sutil para segmentos del medio
+    const r = height / 2;
+    const rMiddle = 5;
     
     if (isFirst && isLast) {
-      // Si es el único segmento, redondear todo
       return `
         M ${x + r} ${y}
         L ${x + width - r} ${y}
@@ -174,7 +163,6 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
         Z
       `;
     } else if (isFirst) {
-      // Primer segmento: redondear solo el lado izquierdo completamente, derecho sutil
       return `
         M ${x + r} ${y}
         L ${x + width - rMiddle} ${y}
@@ -187,7 +175,6 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
         Z
       `;
     } else if (isLast) {
-      // Último segmento: redondear solo el lado derecho completamente, izquierdo sutil
       return `
         M ${x + rMiddle} ${y}
         L ${x + width - r} ${y}
@@ -200,7 +187,6 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
         Z
       `;
     } else {
-      // Segmentos del medio: redondeo sutil en todos los lados
       return `
         M ${x + rMiddle} ${y}
         L ${x + width - rMiddle} ${y}
