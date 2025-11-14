@@ -9,7 +9,7 @@ interface AccountsBarChartProps {
   height?: number;
 }
 
-type SelectedAccount = 'none' | number; // 'none' o el índice de la cuenta
+type SelectedAccount = 'none' | number;
 
 const AccountsBarChart: React.FC<AccountsBarChartProps> = ({ 
   accounts, 
@@ -18,28 +18,76 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
 }) => {
   const [selectedAccount, setSelectedAccount] = useState<SelectedAccount>('none');
   
-  // Calcular el balance total
   const totalBalance = accounts.reduce((sum, account) => sum + account.currentBalance, 0);
   
-  const gapWidth = 8; // Gap entre segmentos
-  const borderRadius = 20; // Radio de borde redondeado
+  const gapWidth = 8;
+  const borderRadius = 50;
+  const minSegmentWidth = 20; // Ancho mínimo para cada segmento
   
-  // Calcular los segmentos
   const calculateSegments = () => {
     if (totalBalance === 0 || accounts.length === 0) return [];
     
-    // Calcular el ancho total disponible restando los gaps
     const totalGaps = gapWidth * (accounts.length - 1);
     const availableWidth = width - totalGaps;
     
-    let currentX = 0;
+    // Calcular anchos proporcionales
+    const proportionalWidths = accounts.map(account => 
+      (account.currentBalance / totalBalance) * availableWidth
+    );
     
+    // Identificar segmentos que necesitan ancho mínimo
+    const needsMinWidth = proportionalWidths.map(w => w < minSegmentWidth);
+    const countNeedsMin = needsMinWidth.filter(Boolean).length;
+    
+    // Si hay segmentos muy pequeños, ajustar
+    let adjustedWidths: number[];
+    
+    if (countNeedsMin > 0) {
+      // Calcular espacio extra necesario para los segmentos pequeños
+      const totalMinWidth = countNeedsMin * minSegmentWidth;
+      const totalCurrentSmallWidth = proportionalWidths
+        .filter((w, i) => needsMinWidth[i])
+        .reduce((sum, w) => sum + w, 0);
+      
+      const extraSpaceNeeded = totalMinWidth - totalCurrentSmallWidth;
+      
+      // Distribuir el espacio extra entre los segmentos grandes
+      const largeSegmentsIndices = needsMinWidth
+        .map((needs, i) => needs ? -1 : i)
+        .filter(i => i >= 0);
+      
+      if (largeSegmentsIndices.length > 0) {
+        const reductionPerLarge = extraSpaceNeeded / largeSegmentsIndices.length;
+        
+        adjustedWidths = proportionalWidths.map((w, i) => {
+          if (needsMinWidth[i]) {
+            return minSegmentWidth;
+          } else {
+            return Math.max(minSegmentWidth, w - reductionPerLarge);
+          }
+        });
+      } else {
+        // Si todos son pequeños, distribuir equitativamente
+        adjustedWidths = accounts.map(() => availableWidth / accounts.length);
+      }
+    } else {
+      adjustedWidths = proportionalWidths;
+    }
+    
+    // Normalizar para que sume exactamente availableWidth
+    const totalAdjusted = adjustedWidths.reduce((sum, w) => sum + w, 0);
+    const normalizedWidths = adjustedWidths.map(w => 
+      (w / totalAdjusted) * availableWidth
+    );
+    
+    // Construir segmentos
+    let currentX = 0;
     return accounts.map((account, index) => {
-      const segmentWidth = (account.currentBalance / totalBalance) * availableWidth;
+      const segmentWidth = normalizedWidths[index];
       const startX = currentX;
       const endX = currentX + segmentWidth;
       
-      currentX = endX + gapWidth; // Añadir gap para el siguiente segmento
+      currentX = endX + gapWidth;
       
       return {
         account,
@@ -56,7 +104,6 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
   const handleBarTouch = (event: any) => {
     const { locationX } = event.nativeEvent;
     
-    // Encontrar en qué segmento se hizo clic
     for (const segment of segments) {
       if (locationX >= segment.startX && locationX <= segment.endX) {
         setSelectedAccount(segment.index);
@@ -73,21 +120,17 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
   
   const getSegmentColor = (index: number) => {
     if (selectedAccount === 'none') {
-      // Mostrar todos los colores normales
       return accounts[index].iconColor || '#71717a';
     }
     
     if (selectedAccount === index) {
-      // El segmento seleccionado mantiene su color
       return accounts[index].iconColor || '#71717a';
     }
     
-    // Los demás segmentos se vuelven grises
     return '#e4e4e7';
   };
   
   const getCenterContent = () => {
-    // Si no hay cuentas, mostrar mensaje de estado vacío
     if (totalBalance === 0 || accounts.length === 0) {
       return { value: 0, label: 'No accounts yet' };
     }
@@ -114,27 +157,68 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
     }).format(Math.abs(amount));
   };
 
-  // Crear el path para un rectángulo redondeado
-  const createRoundedRectPath = (x: number, y: number, width: number, height: number, radius: number) => {
-    const r = Math.min(radius, width / 2, height / 2);
-    return `
-      M ${x + r} ${y}
-      L ${x + width - r} ${y}
-      Q ${x + width} ${y} ${x + width} ${y + r}
-      L ${x + width} ${y + height - r}
-      Q ${x + width} ${y + height} ${x + width - r} ${y + height}
-      L ${x + r} ${y + height}
-      Q ${x} ${y + height} ${x} ${y + height - r}
-      L ${x} ${y + r}
-      Q ${x} ${y} ${x + r} ${y}
-      Z
-    `;
+  const createRoundedRectPath = (x: number, y: number, width: number, height: number, radius: number, isFirst: boolean, isLast: boolean) => {
+    const r = height / 2; // Radio completo para forma de píldora
+    const rMiddle = 5; // Radio sutil para segmentos del medio
+    
+    if (isFirst && isLast) {
+      // Si es el único segmento, redondear todo
+      return `
+        M ${x + r} ${y}
+        L ${x + width - r} ${y}
+        Q ${x + width} ${y} ${x + width} ${y + r}
+        Q ${x + width} ${y + height} ${x + width - r} ${y + height}
+        L ${x + r} ${y + height}
+        Q ${x} ${y + height} ${x} ${y + height - r}
+        Q ${x} ${y} ${x + r} ${y}
+        Z
+      `;
+    } else if (isFirst) {
+      // Primer segmento: redondear solo el lado izquierdo completamente, derecho sutil
+      return `
+        M ${x + r} ${y}
+        L ${x + width - rMiddle} ${y}
+        Q ${x + width} ${y} ${x + width} ${y + rMiddle}
+        L ${x + width} ${y + height - rMiddle}
+        Q ${x + width} ${y + height} ${x + width - rMiddle} ${y + height}
+        L ${x + r} ${y + height}
+        Q ${x} ${y + height} ${x} ${y + height - r}
+        Q ${x} ${y} ${x + r} ${y}
+        Z
+      `;
+    } else if (isLast) {
+      // Último segmento: redondear solo el lado derecho completamente, izquierdo sutil
+      return `
+        M ${x + rMiddle} ${y}
+        L ${x + width - r} ${y}
+        Q ${x + width} ${y} ${x + width} ${y + r}
+        Q ${x + width} ${y + height} ${x + width - r} ${y + height}
+        L ${x + rMiddle} ${y + height}
+        Q ${x} ${y + height} ${x} ${y + height - rMiddle}
+        L ${x} ${y + rMiddle}
+        Q ${x} ${y} ${x + rMiddle} ${y}
+        Z
+      `;
+    } else {
+      // Segmentos del medio: redondeo sutil en todos los lados
+      return `
+        M ${x + rMiddle} ${y}
+        L ${x + width - rMiddle} ${y}
+        Q ${x + width} ${y} ${x + width} ${y + rMiddle}
+        L ${x + width} ${y + height - rMiddle}
+        Q ${x + width} ${y + height} ${x + width - rMiddle} ${y + height}
+        L ${x + rMiddle} ${y + height}
+        Q ${x} ${y + height} ${x} ${y + height - rMiddle}
+        L ${x} ${y + rMiddle}
+        Q ${x} ${y} ${x + rMiddle} ${y}
+        Z
+      `;
+    }
   };
 
   return (
     <TouchableWithoutFeedback onPress={handleContainerTouch}>
       <View style={styles.container}>
-        {/* Información central */}
         <View style={styles.centerContent}>
           <Text style={styles.balanceAmount}>
             {formatCurrency(centerContent.value)}
@@ -148,10 +232,8 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
           </Text>
         </View>
         
-        {/* Gráfico de barra */}
         <View style={styles.chartContainer}>
           {totalBalance === 0 || accounts.length === 0 ? (
-            // Estado vacío: barra gris completa
             <View 
               style={[
                 styles.emptyBar,
@@ -174,7 +256,9 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
                         0,
                         segment.width,
                         height,
-                        borderRadius
+                        borderRadius,
+                        index === 0,
+                        index === segments.length - 1
                       )}
                       fill={getSegmentColor(index)}
                     />
