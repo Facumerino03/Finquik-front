@@ -1,4 +1,4 @@
-import { ChevronRight, Plus } from 'lucide-react-native';
+import { ChevronRight } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Account } from '../core/types/transactions';
@@ -90,12 +90,10 @@ export default function AccountsList({ accounts, totalBalance }: AccountsListPro
         {/* Add Account Button */}
         <TouchableOpacity
           onPress={() => setShowCreateModal(true)}
-          className="flex-row items-center bg-zinc-50 rounded-xl px-3 py-2"
           activeOpacity={0.7}
         >
-          <Plus size={18} color="#09090b" strokeWidth={2.5} />
-          <Text className="text-zinc-950 text-sm font-geist-medium ml-1">
-            Add
+          <Text className="text-zinc-500 text-base font-geist-medium">
+            Add new
           </Text>
         </TouchableOpacity>
       </View>
