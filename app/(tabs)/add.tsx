@@ -1,5 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
+import * as LucideIcons from 'lucide-react-native';
 import { ArrowLeft, ChevronDown, FileText, Pencil, Plus } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
@@ -50,7 +51,6 @@ export default function AddTransactionScreen() {
     try {
       setIsLoadingCategories(true);
       const data = await getCategoriesByType(selectedType);
-      console.log('Categories loaded:', JSON.stringify(data, null, 2)); // <- AGREGAR ESTO
       setCategories(data);
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -415,52 +415,57 @@ export default function AddTransactionScreen() {
                   {categories.map((category) => {
                     const isSelected = selectedCategoryId === category.id;
                     
-                    console.log('Category:', category.name, 'iconColor:', category.iconColor); // <- AGREGAR ESTO
+                    // Buscar el color de fondo en AVAILABLE_COLORS
+                    const colorConfig = AVAILABLE_COLORS.find(c => c.value === category.iconColor);
+                    const bgColor = colorConfig?.bg || '#f4f4f5';
                     
-                    // Obtener el color de fondo del círculo del ícono desde AVAILABLE_COLORS
-                    const getIconBackgroundColor = () => {
-                      if (isSelected) return '#ffffff'; // Blanco cuando está seleccionado
-                      
-                      // Buscar el color en AVAILABLE_COLORS
-                      const colorConfig = AVAILABLE_COLORS.find(c => c.value === category.iconColor);
-                      console.log('Color config found:', colorConfig); // <- AGREGAR ESTO
-                      return colorConfig?.bg || '#f4f4f5'; // zinc-100 como fallback
-                    };
+                    // Obtener el componente de icono de Lucide
+                    const IconComponent = LucideIcons[category.iconName as keyof typeof LucideIcons] as React.ComponentType<any>;
                     
                     return (
                       <TouchableOpacity
                         key={category.id}
                         onPress={() => setSelectedCategoryId(category.id)}
-                        className={`flex-row items-center pl-2 pr-4 py-2 rounded-full mr-2 ${
-                          isSelected
-                            ? 'bg-zinc-950'
-                            : 'bg-white border border-zinc-200'
-                        }`}
+                        className="flex-row items-center rounded-full"
+                        style={{
+                          backgroundColor: isSelected ? bgColor : '#ffffff',
+                          borderWidth: 1,
+                          borderColor: isSelected ? (category.iconColor || '#e4e4e7') : '#e4e4e7',
+                          paddingLeft: 4,
+                          paddingRight: 12,
+                          paddingVertical: 4,
+                          marginRight: 8,
+                        }}
                         activeOpacity={0.7}
-                        style={{ height: 48 }}
                       >
-                        {/* Icon Container */}
-                        <View 
-                          className="rounded-full items-center justify-center mr-3"
-                          style={{ 
-                            width: 36,
-                            height: 36,
-                            backgroundColor: getIconBackgroundColor(),
-                          }}
-                        >
+                        {/* NO seleccionado */}
+                        {!isSelected && (
                           <CategoryIcon
                             iconName={category.iconName}
-                            size={16}
-                            color={category.iconColor || '#09090b'} // <- Agregar fallback
+                            iconColor={category.iconColor}
+                            size={15}
+                            containerSize={36}
                           />
-                        </View>
+                        )}
+                        
+                        {/* SELECCIONADO - invertir colores */}
+                        {isSelected && IconComponent && (
+                          <View 
+                            className="w-9 h-9 rounded-full items-center justify-center"
+                            style={{
+                              backgroundColor: category.iconColor || '#71717a',
+                            }}
+                          >
+                            <IconComponent
+                              size={15}
+                              color={bgColor}
+                              strokeWidth={2}
+                            />
+                          </View>
+                        )}
                         
                         {/* Category Name */}
-                        <Text 
-                          className={`text-base font-geist-medium ${
-                            isSelected ? 'text-white' : 'text-zinc-950'
-                          }`}
-                        >
+                        <Text className="text-sm font-geist-medium text-zinc-600 ml-2">
                           {category.name}
                         </Text>
                       </TouchableOpacity>
