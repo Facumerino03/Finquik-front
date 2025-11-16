@@ -2,12 +2,12 @@ import { router } from 'expo-router';
 import { ArrowBigDown, ArrowBigUp, Edit, Trash2, X } from 'lucide-react-native';
 import React from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Modal,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useDeleteTransaction } from '../core/hooks/useDeleteTransaction';
 import { Transaction } from '../core/types/transactions';
@@ -245,39 +245,33 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
           </View>
 
           {/* Footer Buttons */}
-          <View className="flex-row px-6 py-5" style={{ gap: 12 }}>
+          <View className="px-6 pb-8 pt-4 flex-row gap-3">
+            {/* Delete Button */}
             <TouchableOpacity
               onPress={handleDelete}
-              className="flex-1 py-3 px-4 rounded-lg border border-zinc-200"
+              disabled={isDeleting}
+              className={`w-14 h-14 rounded-full items-center justify-center ${
+                isDeleting ? 'bg-red-200' : 'bg-red-500'
+              }`}
+              activeOpacity={0.7}
+            >
+              {isDeleting ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <Trash2 size={22} color="#FFFFFF" strokeWidth={2} />
+              )}
+            </TouchableOpacity>
+
+            {/* Edit Button */}
+            <TouchableOpacity
+              onPress={handleEdit}
+              className="flex-1 py-4 rounded-lg bg-zinc-950"
               activeOpacity={0.7}
               disabled={isDeleting}
             >
-              {isDeleting ? (
-                <View className="flex-row items-center justify-center">
-                  <ActivityIndicator size="small" color="#09090b" />
-                  <Text className="ml-2 text-lg font-geist-medium text-zinc-950">
-                    Deleting...
-                  </Text>
-                </View>
-              ) : (
-                <View className="flex-row items-center justify-center">
-                  <Trash2 size={20} color="#09090b" />
-                  <Text className="ml-2 text-lg font-geist-medium text-zinc-950">
-                    Delete
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              onPress={handleEdit}
-              className="flex-1 py-3 px-4 rounded-lg bg-zinc-950"
-              activeOpacity={0.7}
-            >
               <View className="flex-row items-center justify-center">
-                <Edit size={20} color="#FFFFFF" />
-                <Text className="ml-2 text-lg font-geist-medium text-white">
-                  Edit
+                <Text className="ml-2 text-lg font-geist-semibold text-white">
+                  Edit transaction
                 </Text>
               </View>
             </TouchableOpacity>
