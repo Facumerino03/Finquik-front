@@ -1,4 +1,4 @@
-import { X } from 'lucide-react-native';
+import { Banknote, Building2, CreditCard, TrendingUp, Wallet, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -21,12 +21,59 @@ interface CreateAccountModalProps {
 }
 
 const ACCOUNT_TYPES = [
-  { value: 'BANK_ACCOUNT', label: 'Bank Account' },
-  { value: 'CREDIT_CARD', label: 'Credit Card' },
-  { value: 'CASH', label: 'Cash' },
-  { value: 'SAVINGS', label: 'Savings' },
-  { value: 'INVESTMENT', label: 'Investment' },
+  { 
+    value: 'CASH', 
+    label: 'Cash',
+    icon: 'Banknote',
+    color: '#22c55e',
+    bg: '#dcfce7'
+  },
+  { 
+    value: 'BANK_ACCOUNT', 
+    label: 'Bank account',
+    icon: 'Building2',
+    color: '#3b82f6',
+    bg: '#dbeafe'
+  },
+  { 
+    value: 'CREDIT_CARD', 
+    label: 'Credit card',
+    icon: 'CreditCard',
+    color: '#f97316',
+    bg: '#ffedd5'
+  },
+  { 
+    value: 'SAVINGS', 
+    label: 'Savings',
+    icon: 'Wallet',
+    color: '#8b5cf6',
+    bg: '#ede9fe'
+  },
+  { 
+    value: 'INVESTMENT', 
+    label: 'Investment',
+    icon: 'TrendingUp',
+    color: '#a855f7',
+    bg: '#f3e8ff'
+  },
 ];
+
+const getAccountTypeIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'Banknote':
+      return Banknote;
+    case 'Building2':
+      return Building2;
+    case 'CreditCard':
+      return CreditCard;
+    case 'Wallet':
+      return Wallet;
+    case 'TrendingUp':
+      return TrendingUp;
+    default:
+      return Wallet;
+  }
+};
 
 export default function CreateAccountModal({ visible, onClose }: CreateAccountModalProps) {
   const { createAccount, isCreating } = useAccountsManager();
@@ -73,7 +120,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
       name: name.trim(),
       type: selectedType,
       initialBalance: parseFloat(balance),
-      currency: 'USD', // Fijo en USD
+      currency: 'USD',
       iconName: selectedIcon || undefined,
       iconColor: selectedColor || undefined,
     };
@@ -97,11 +144,11 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
         onRequestClose={handleClose}
       >
         <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white rounded-t-3xl" style={{ height: '70%' }}>
+          <View className="bg-white rounded-t-3xl" style={{ height: '75%' }}>
             {/* Header */}
-            <View className="flex-row items-center justify-between px-6 pt-10 pb-5">
+            <View className="flex-row items-center justify-between px-6 pt-10 pb-8">
               <Text className="text-2xl font-geist-semibold text-zinc-950">
-                Create Account
+                Create account
               </Text>
               <TouchableOpacity
                 onPress={handleClose}
@@ -118,100 +165,90 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
               className="flex-1 px-6"
               showsVerticalScrollIndicator={false}
             >
-              {/* Icon Selector */}
-              <View className="mb-6">
-                <Text className="text-sm font-geist text-zinc-500 mb-2">
-                  Icon & Color
-                </Text>
+              {/* Icon Display - Grande y centrado */}
+              <View className="items-center mb-8">
                 <TouchableOpacity
                   onPress={() => setShowIconPicker(true)}
-                  className="bg-zinc-50 rounded-2xl px-4 py-4 flex-row items-center justify-between"
                   activeOpacity={0.7}
                   disabled={isCreating}
                 >
-                  <View className="flex-row items-center">
-                    {selectedIcon && selectedColor ? (
-                      <>
-                        <View 
-                          className="w-14 h-14 rounded-full items-center justify-center mr-4"
-                          style={{ 
-                            backgroundColor: `${selectedColor}20` // 20 es opacidad en hex
-                          }}
-                        >
-                          <CategoryIcon
-                            iconName={selectedIcon}
-                            size={24}
-                            color={selectedColor}
-                          />
-                        </View>
-                        <Text className="text-base font-geist text-zinc-950">
-                          {selectedIcon}
-                        </Text>
-                      </>
-                    ) : (
-                      <Text className="text-base font-geist text-zinc-500">
-                        Select icon and color
-                      </Text>
-                    )}
-                  </View>
-                  <Text className="text-base font-geist text-zinc-400">›</Text>
+                  {selectedIcon && selectedColor ? (
+                    <CategoryIcon
+                      iconName={selectedIcon}
+                      iconColor={selectedColor}
+                      size={28}
+                      containerSize={76}
+                    />
+                  ) : (
+                    <View className="w-20 h-20 rounded-full bg-zinc-100 items-center justify-center border-2 border-dashed border-zinc-300">
+                      <Text className="text-3xl">+</Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
+                <Text className="text-sm font-geist text-zinc-500 mt-3">
+                  Tap to {selectedIcon ? 'change' : 'select'} icon
+                </Text>
               </View>
 
               {/* Account Name */}
               <View className="mb-6">
-                <Text className="text-sm font-geist text-zinc-500 mb-2">
-                  Account Name
+                <Text className="text-sm font-geist text-zinc-950 mb-2">
+                  Account name
                 </Text>
                 <TextInput
                   value={name}
                   onChangeText={setName}
-                  placeholder="e.g., Main Checking"
+                  placeholder="Enter account name"
                   placeholderTextColor="#a1a1aa"
-                  className="bg-zinc-50 rounded-2xl px-4 py-4 text-base font-geist text-zinc-950"
+                  className="bg-zinc-50 rounded-lg px-4 py-4 text-base font-geist text-zinc-950"
                   editable={!isCreating}
                 />
               </View>
 
               {/* Account Type */}
               <View className="mb-6">
-                <Text className="text-sm font-geist text-zinc-500 mb-2">
-                  Account Type
+                <Text className="text-sm font-geist text-zinc-950 mb-2">
+                  Account type
                 </Text>
                 <View className="flex-row flex-wrap gap-2">
-                  {ACCOUNT_TYPES.map((type) => (
-                    <TouchableOpacity
-                      key={type.value}
-                      onPress={() => setSelectedType(type.value)}
-                      className={`px-4 py-3 rounded-xl ${
-                        selectedType === type.value
-                          ? 'bg-zinc-950'
-                          : 'bg-zinc-50'
-                      }`}
-                      activeOpacity={0.7}
-                      disabled={isCreating}
-                    >
-                      <Text
-                        className={`text-sm font-geist-medium ${
-                          selectedType === type.value
-                            ? 'text-white'
-                            : 'text-zinc-950'
-                        }`}
+                  {ACCOUNT_TYPES.map((type) => {
+                    const IconComponent = getAccountTypeIcon(type.icon);
+                    const isSelected = selectedType === type.value;
+                    
+                    return (
+                      <TouchableOpacity
+                        key={type.value}
+                        onPress={() => setSelectedType(type.value)}
+                        className="flex-row items-center px-3 py-2 rounded-full"
+                        style={{
+                          backgroundColor: isSelected ? type.bg : '#ffffff',
+                          borderWidth: 1,
+                          borderColor: isSelected ? type.color : '#e4e4e7',
+                        }}
+                        activeOpacity={0.7}
+                        disabled={isCreating}
                       >
-                        {type.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <IconComponent
+                          size={15}
+                          color={type.color}
+                          strokeWidth={2}
+                        />
+                        <Text className="text-sm font-geist-medium text-zinc-600 ml-2">
+                          {type.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
 
               {/* Initial Balance */}
               <View className="mb-6">
-                <Text className="text-sm font-geist text-zinc-500 mb-2">
-                  Initial Balance
+                <Text className="text-sm font-geist text-zinc-950 mb-2">
+                  Initial balance
                 </Text>
-                <View className="bg-zinc-50 rounded-2xl px-4 py-4 flex-row items-center">
-                  <Text className="text-base font-geist text-zinc-500 mr-2">$</Text>
+                <View className="bg-zinc-50 rounded-lg px-4 py-4 flex-row items-center">
+                  <Text className="text-sg font-geist-medium text-zinc-500 mr-2">$</Text>
                   <TextInput
                     value={balance}
                     onChangeText={setBalance}
@@ -221,7 +258,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
                     className="flex-1 text-base font-geist text-zinc-950"
                     editable={!isCreating}
                   />
-                  <Text className="text-sm font-geist text-zinc-500">USD</Text>
+                  <Text className="text-sm font-geist-medium text-zinc-500">USD</Text>
                 </View>
               </View>
             </ScrollView>
@@ -231,7 +268,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
               <TouchableOpacity
                 onPress={handleCreate}
                 disabled={isCreating || !name.trim() || !balance.trim()}
-                className={`py-4 rounded-xl ${
+                className={`py-4 rounded-lg ${
                   isCreating || !name.trim() || !balance.trim()
                     ? 'bg-zinc-300'
                     : 'bg-zinc-950'
