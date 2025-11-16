@@ -38,7 +38,6 @@ export default function AddTransactionScreen() {
   const [description, setDescription] = useState('');
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
-
   const { userToken, isLoading: authLoading } = useAuth();
   const { accounts, isLoading: accountsLoading } = useAccounts();
   const { createTransaction, isLoading: isCreating } = useCreateTransaction();
@@ -113,10 +112,6 @@ export default function AddTransactionScreen() {
 
   const handleCategoryCreated = () => {
     loadCategories();
-  };
-
-  const handleCreateAccount = () => {
-    Alert.alert('Create Account', 'Feature coming soon!');
   };
 
   const formatCurrency = (amount: number) => {
@@ -349,16 +344,28 @@ export default function AddTransactionScreen() {
                   className="flex-row items-center justify-between bg-zinc-50 rounded-2xl px-4 py-4"
                   activeOpacity={0.7}
                 >
-
                   <View className="flex-1 flex-row items-center">
-                    {/* Circle */}
-                    <View 
-                      className="rounded-full bg-zinc-300"
-                      style={{ 
-                        width: 40, 
-                        height: 40,
-                      }}
-                    />
+                    {/* Account Icon */}
+                    {(() => {
+                      const selectedAccount = accounts.find(acc => acc.id === selectedAccountId);
+                      return selectedAccount?.iconName && selectedAccount?.iconColor ? (
+                        <CategoryIcon
+                          iconName={selectedAccount.iconName}
+                          iconColor={selectedAccount.iconColor}
+                          size={20}
+                          containerSize={40}
+                        />
+                      ) : (
+                        <View 
+                          className="rounded-full"
+                          style={{ 
+                            width: 40, 
+                            height: 40,
+                            backgroundColor: selectedAccount?.iconColor || '#d4d4d8',
+                          }}
+                        />
+                      );
+                    })()}
 
                     {/* Account Name and Balance */}
                     <View className="ml-3 flex-1">
@@ -522,7 +529,6 @@ export default function AddTransactionScreen() {
         accounts={accounts}
         selectedAccountId={selectedAccountId}
         onSelectAccount={setSelectedAccountId}
-        onCreateAccount={handleCreateAccount}
       />
 
       {/* Date Picker */}
