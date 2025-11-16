@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Modal,
   ScrollView,
   Text,
@@ -144,7 +145,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
         onRequestClose={handleClose}
       >
         <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white rounded-t-3xl" style={{ height: '75%' }}>
+          <View className="bg-white rounded-t-3xl" style={{ height: '80%' }}>
             {/* Header */}
             <View className="flex-row items-center justify-between px-6 pt-10 pb-8">
               <Text className="text-2xl font-geist-semibold text-zinc-950">
@@ -191,8 +192,8 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
               </View>
 
               {/* Account Name */}
-              <View className="mb-6">
-                <Text className="text-sm font-geist text-zinc-950 mb-2">
+              <View className="mb-8">
+                <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Account name
                 </Text>
                 <TextInput
@@ -200,14 +201,14 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
                   onChangeText={setName}
                   placeholder="Enter account name"
                   placeholderTextColor="#a1a1aa"
-                  className="bg-zinc-50 rounded-lg px-4 py-4 text-base font-geist text-zinc-950"
+                  className="bg-white border border-zinc-200 rounded-lg px-4 py-4 text-base font-geist text-zinc-950"
                   editable={!isCreating}
                 />
               </View>
 
               {/* Account Type */}
-              <View className="mb-6">
-                <Text className="text-sm font-geist text-zinc-950 mb-2">
+              <View className="mb-8">
+                <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Account type
                 </Text>
                 <View className="flex-row flex-wrap gap-2">
@@ -219,20 +220,30 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
                       <TouchableOpacity
                         key={type.value}
                         onPress={() => setSelectedType(type.value)}
-                        className="flex-row items-center px-3 py-2 rounded-full"
+                        className="flex-row items-center rounded-full"
                         style={{
                           backgroundColor: isSelected ? type.bg : '#ffffff',
                           borderWidth: 1,
                           borderColor: isSelected ? type.color : '#e4e4e7',
+                          paddingLeft: 4,
+                          paddingRight: 12,
+                          paddingVertical: 4,
                         }}
                         activeOpacity={0.7}
                         disabled={isCreating}
                       >
-                        <IconComponent
-                          size={15}
-                          color={type.color}
-                          strokeWidth={2}
-                        />
+                        <View
+                          className="w-9 h-9 rounded-full items-center justify-center"
+                          style={{
+                            backgroundColor: isSelected ? type.color : type.bg,
+                          }}
+                        >
+                          <IconComponent
+                            size={15}
+                            color={isSelected ? type.bg : type.color}
+                            strokeWidth={2}
+                          />
+                        </View>
                         <Text className="text-sm font-geist-medium text-zinc-600 ml-2">
                           {type.label}
                         </Text>
@@ -243,22 +254,32 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
               </View>
 
               {/* Initial Balance */}
-              <View className="mb-6">
-                <Text className="text-sm font-geist text-zinc-950 mb-2">
+              <View className="mb-8">
+                <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Initial balance
                 </Text>
-                <View className="bg-zinc-50 rounded-lg px-4 py-4 flex-row items-center">
-                  <Text className="text-sg font-geist-medium text-zinc-500 mr-2">$</Text>
+                <View className="bg-white border border-zinc-200 rounded-lg px-4 py-4 flex-row items-center">
+                  <Text className="text-base font-geist-medium text-zinc-500 mr-2">$</Text>
                   <TextInput
                     value={balance}
                     onChangeText={setBalance}
                     placeholder="0.00"
                     placeholderTextColor="#a1a1aa"
                     keyboardType="decimal-pad"
-                    className="flex-1 text-base font-geist text-zinc-950"
+                    className="flex-1 text-base font-geist-medium text-zinc-950"
+                    style={{ 
+                      paddingVertical: 0,
+                      paddingHorizontal: 0,
+                      includeFontPadding: false,
+                      textAlignVertical: 'center',
+                    }}
                     editable={!isCreating}
                   />
-                  <Text className="text-sm font-geist-medium text-zinc-500">USD</Text>
+                  <Image
+                    source={require('../shared/assets/icons/us.png')}
+                    style={{ width: 24, height: 24, marginLeft: 8 }}
+                    resizeMode="contain"
+                  />
                 </View>
               </View>
             </ScrollView>
