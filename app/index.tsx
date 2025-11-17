@@ -1,8 +1,8 @@
 import { Redirect } from 'expo-router';
-import { Text, View } from 'react-native';
-import "../global.css";
 import "expo-router/entry";
+import { Text, View } from 'react-native';
 import { useAuth } from '../core/contexts/AuthContext';
+import "../global.css";
 
 export default function Index() {
   const { userToken, isLoading } = useAuth();
@@ -16,8 +16,8 @@ export default function Index() {
   }
 
   if (!userToken) {
-    console.log("No token, redirecting to login");
-    return <Redirect href="/(auth)/login" />;
+    console.log("No token, redirecting to onboarding");
+    return <Redirect href="/(auth)/onboarding" />;
   }
 
   console.log("Token found, redirecting to tabs");
