@@ -26,12 +26,10 @@ const Chart: React.FC<ChartProps> = ({
   const centerX = size / 2;
   const centerY = size / 2;
 
-  // Para un semicírculo perfecto, empezamos desde 180° (izquierda) hasta 360° (derecha)
   const startAngle = 180;
   const endAngle = 360;
-  const totalAngle = 180; // 180 grados para un semicírculo
-
-  const gapAngle = 15; // Aumentar el gap para que sea más visible
+  const totalAngle = 180;
+  const gapAngle = 15;
   
   const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
   
@@ -93,7 +91,6 @@ const Chart: React.FC<ChartProps> = ({
   let incomeStartAngle, incomeEndAngle, expensesStartAngle, expensesEndAngle;
   
   if (total === 0) {
-    // Sin transacciones
     incomeStartAngle = incomeEndAngle = expensesStartAngle = expensesEndAngle = 0;
   } else if (income > 0 && expenses > 0) {
     // Ambos tipos presentes - aplicar gap
@@ -191,12 +188,29 @@ const Chart: React.FC<ChartProps> = ({
   const centerContent = getCenterContent();
   
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    const formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(Math.abs(amount));
+    
+    // Solo agregar signo - cuando el balance es negativo
+    if (selectedSegment === 'none' && balance < 0) {
+      return `-${formatted}`;
+    }
+    
+    return formatted;
+  };
+
+  // Determinar el color del texto del balance
+  const getBalanceColor = () => {
+    if (selectedSegment !== 'none' || total === 0) {
+      return '#09090b'; // Color por defecto
+    }
+    
+    // Solo cambiar a rojo cuando el balance es negativo
+    return balance < 0 ? '#fb2c36' : '#09090b';
   };
 
   return (
@@ -245,7 +259,11 @@ const Chart: React.FC<ChartProps> = ({
           {/* Contenido central */}
           <TouchableWithoutFeedback onPress={handleContainerTouch}>
             <View style={styles.centerContent}>
-              <Text style={styles.balanceAmount}>
+              <Text style={[
+                styles.balanceAmount, 
+                total === 0 && styles.emptyStateLabel,
+                { color: getBalanceColor() }
+              ]}>
                 {total === 0 ? '$0' : formatCurrency(centerContent.value)}
               </Text>
               <Text style={[styles.balanceLabel, total === 0 && styles.emptyStateLabel]}>
@@ -278,7 +296,6 @@ const styles = StyleSheet.create({
   balanceAmount: {
     fontSize: 52,
     fontFamily: 'Inter_700Bold',
-    color: '#09090b',
     textAlign: 'center',
   },
   balanceLabel: {
