@@ -260,8 +260,7 @@ const Chart: React.FC<ChartProps> = ({
           <TouchableWithoutFeedback onPress={handleContainerTouch}>
             <View style={styles.centerContent}>
               <Text style={[
-                styles.balanceAmount, 
-                total === 0 && styles.emptyStateLabel,
+                styles.balanceAmount,
                 { color: getBalanceColor() }
               ]}>
                 {total === 0 ? '$0' : formatCurrency(centerContent.value)}

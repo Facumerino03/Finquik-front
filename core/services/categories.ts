@@ -22,3 +22,19 @@ export async function createCategory(categoryData: CreateCategoryPayload): Promi
   const { data } = await api.post<Category>('/api/categories', categoryData);
   return data;
 }
+
+export interface UpdateCategoryPayload {
+  name: string;
+  type: 'INCOME' | 'EXPENSE';
+  iconName?: string;
+  iconColor?: string;
+}
+
+export async function updateCategory(categoryId: number, categoryData: UpdateCategoryPayload): Promise<Category> {
+  const { data } = await api.put<Category>(`/api/categories/${categoryId}`, categoryData);
+  return data;
+}
+
+export async function deleteCategory(categoryId: number): Promise<void> {
+  await api.delete(`/api/categories/${categoryId}`);
+}
