@@ -41,7 +41,7 @@ export default function ForgotPasswordScreen() {
         <ArrowLeft size={20} color="#09090b" />
       </TouchableOpacity>
 
-      <View className="mb-12">
+      <View className="mb-10">
         <Text className="text-4xl text-center mb-4 text-zinc-950 font-geist-bold">
           Forgot password?
         </Text>
@@ -54,7 +54,7 @@ export default function ForgotPasswordScreen() {
         <View>
           <Text className="text-zinc-950 mb-2 font-geist-medium">Email address</Text>
           <TextInput
-            className="border border-zinc-200 rounded-lg px-4 py-4 text-base bg-white text-zinc-500 mb-4"
+            className="border border-zinc-200 rounded-lg px-4 py-4 text-base bg-white text-zinc-500 mb-10"
             placeholder="Enter your email address"
             value={email}
             onChangeText={setEmail}
@@ -75,15 +75,12 @@ export default function ForgotPasswordScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="py-2"
-          activeOpacity={0.7}
-        >
-          <Text className="text-zinc-950 text-center text-base font-geist-medium">
-            Back to login
-          </Text>
-        </TouchableOpacity>
+        {/* Back to login - Mismo estilo que "Create one" */}
+        <View className="flex-row justify-center mt-6">
+          <TouchableOpacity onPress={() => router.back()}>
+            <Text className="text-zinc-950 font-geist-semibold underline">Back to login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
