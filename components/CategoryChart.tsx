@@ -12,16 +12,16 @@ interface CategoryChartProps {
   categories: CategoryData[];
   size?: number;
   strokeWidth?: number;
-  color?: string; // Color principal para los segmentos
+  color?: string;
 }
 
-type SelectedSegment = 'none' | number; // 'none' o el índice de la categoría
+type SelectedSegment = 'none' | number;
 
 const CategoryChart: React.FC<CategoryChartProps> = ({ 
   categories, 
   size = 300, 
   strokeWidth = 25,
-  color = '#00c950' // Verde por defecto (para incomes)
+  color = '#00c950'
 }) => {
   const [selectedSegment, setSelectedSegment] = useState<SelectedSegment>('none');
   
@@ -31,12 +31,13 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
   const centerX = size / 2;
   const centerY = size / 2;
 
-  // Para un semicírculo perfecto, empezamos desde 180° (izquierda) hasta 360° (derecha)
   const startAngle = 180;
   const endAngle = 360;
-  const totalAngle = 180; // 180 grados para un semicírculo
-
-  const gapAngle = 15; // Mismo gap que en el Chart original
+  const totalAngle = 180;
+  const gapAngle = 15;
+  
+  // Área táctil extendida para segmentos pequeños (en grados)
+  const minTouchAngle = 10; // Mínimo 10 grados para toques precisos
   
   const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
   
@@ -70,8 +71,9 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
     const dy = y - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    const innerRadius = radius - strokeWidth / 2;
-    const outerRadius = radius + strokeWidth / 2;
+    // Área táctil más amplia: desde el centro hasta más allá del borde exterior
+    const innerRadius = 0; // Permitir toques desde el centro
+    const outerRadius = radius + strokeWidth; // Ampliar área táctil externa
     
     if (distance < innerRadius || distance > outerRadius) {
       return false;
@@ -80,8 +82,20 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
     let angle = Math.atan2(dy, dx) * (180 / Math.PI);
     if (angle < 0) angle += 360;
     
-    let normalizedStart = startAngleDeg;
-    let normalizedEnd = endAngleDeg;
+    // Expandir el área táctil para segmentos pequeños
+    const segmentAngle = endAngleDeg - startAngleDeg;
+    let touchStartAngle = startAngleDeg;
+    let touchEndAngle = endAngleDeg;
+    
+    if (segmentAngle < minTouchAngle) {
+      // Expandir el área táctil simétricamente
+      const expansion = (minTouchAngle - segmentAngle) / 2;
+      touchStartAngle -= expansion;
+      touchEndAngle += expansion;
+    }
+    
+    let normalizedStart = touchStartAngle;
+    let normalizedEnd = touchEndAngle;
     let normalizedAngle = angle;
     
     if (normalizedStart > normalizedEnd) {
@@ -94,11 +108,9 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
     return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
   };
   
-  // Calcular los ángulos de cada segmento
   const calculateSegmentAngles = () => {
     if (total === 0) return [];
     
-    // Calcular el ángulo total disponible restando los gaps
     const totalGaps = gapAngle * (categories.length - 1);
     const availableAngle = totalAngle - totalGaps;
     
@@ -109,7 +121,6 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
       const startAngleDeg = currentAngle;
       const endAngleDeg = currentAngle + segmentAngle;
       
-      // Añadir gap después de cada segmento (excepto el último)
       currentAngle = endAngleDeg + (index < categories.length - 1 ? gapAngle : 0);
       
       return {
@@ -128,7 +139,9 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
   const handleSvgTouch = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
     
-    for (const segment of segments) {
+    // Buscar en orden inverso para dar prioridad a segmentos más cercanos al toque
+    for (let i = segments.length - 1; i >= 0; i--) {
+      const segment = segments[i];
       if (isPointInArc(locationX, locationY, segment.startAngle, segment.endAngle)) {
         setSelectedSegment(selectedSegment === segment.index ? 'none' : segment.index);
         return;
@@ -144,18 +157,17 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
   
   const getSegmentColor = (index: number) => {
     if (selectedSegment === 'none') {
-      return color; // Usar el color pasado como prop
+      return color;
     }
     
     if (selectedSegment === index) {
-      return color; // Usar el color pasado como prop cuando está seleccionado
+      return color;
     }
     
-    return '#e4e4e7'; // Gris cuando no está seleccionado
+    return '#e4e4e7';
   };
   
   const getCenterContent = () => {
-    // Si no hay categorías, mostrar mensaje de estado vacío
     if (total === 0) {
       return { value: 0, label: 'No transactions yet' };
     }
@@ -168,7 +180,6 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
       };
     }
     
-    // Determinar el label según el color
     const label = color === '#fb2c36' ? 'Total expenses' : 'Total incomes';
     return { value: total, label };
   };
@@ -191,7 +202,6 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
           <TouchableWithoutFeedback onPress={handleSvgTouch}>
             <Svg width={size} height={size * 0.6} viewBox={`0 0 ${size} ${size * 0.6}`}>
               <G>
-                {/* Estado vacío: arco completo gris */}
                 {total === 0 && (
                   <Path
                     d={createArcPath(startAngle, endAngle, radius, centerX, centerY)}
@@ -202,7 +212,6 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
                   />
                 )}
                 
-                {/* Segmentos de categorías */}
                 {segments.map((segment, index) => (
                   <Path
                     key={segment.category.id}
@@ -217,7 +226,6 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
             </Svg>
           </TouchableWithoutFeedback>
           
-          {/* Contenido central */}
           <TouchableWithoutFeedback onPress={handleContainerTouch}>
             <View style={styles.centerContent}>
               <Text style={styles.balanceAmount}>
