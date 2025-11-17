@@ -33,30 +33,32 @@ export default function AccountsList({ accounts, totalBalance }: AccountsListPro
   const AccountItem = ({ account }: { account: Account }) => (
     <TouchableOpacity
       onPress={() => handleAccountPress(account)}
-      className="flex-row items-center justify-between bg-zinc-50 rounded-2xl px-4 py-4 mb-3"
+      className="flex-row items-center justify-between bg-zinc-50 rounded-xl px-4 py-5 mb-3 border border-zinc-200"
       activeOpacity={0.7}
     >
       <View className="flex-row items-center flex-1">
-        {/* Icon with account color - usando la misma lógica que CategoriesList */}
+        {/* Icon with account color */}
         {account.iconName && account.iconColor ? (
           <CategoryIcon
             iconName={account.iconName}
             iconColor={account.iconColor}
-            size={24}
-            containerSize={56}
+            size={20}
+            containerSize={40}
           />
         ) : (
           // Fallback: círculo con color sólido si no hay icono
           <View
-            className="w-14 h-14 rounded-full"
+            className="rounded-full"
             style={{
+              width: 40,
+              height: 40,
               backgroundColor: account.iconColor || '#71717a',
             }}
           />
         )}
 
         {/* Account Info */}
-        <View className="ml-4 flex-1">
+        <View className="ml-3 flex-1">
           <Text 
             className="text-base font-geist-semibold text-zinc-950 mb-1"
             numberOfLines={1}

@@ -431,9 +431,10 @@ export default function AddTransactionScreen() {
                           backgroundColor: isSelected ? bgColor : '#ffffff',
                           borderWidth: 1,
                           borderColor: isSelected ? (category.iconColor || '#e4e4e7') : '#e4e4e7',
-                          paddingLeft: 4,
-                          paddingRight: 12,
-                          paddingVertical: 4,
+                          paddingLeft: 6,
+                          paddingRight: 14,
+                          paddingTop: 6,
+                          paddingBottom: 6,
                           marginRight: 8,
                         }}
                         activeOpacity={0.7}
@@ -451,8 +452,10 @@ export default function AddTransactionScreen() {
                         {/* SELECCIONADO - invertir colores */}
                         {isSelected && IconComponent && (
                           <View 
-                            className="w-9 h-9 rounded-full items-center justify-center"
+                            className="rounded-full items-center justify-center"
                             style={{
+                              width: 36,
+                              height: 36,
                               backgroundColor: category.iconColor || '#71717a',
                             }}
                           >

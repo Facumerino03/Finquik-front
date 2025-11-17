@@ -327,7 +327,7 @@ export default function EditTransactionScreen() {
             {accounts.length > 0 ? (
               <TouchableOpacity
                 onPress={() => setShowAccountModal(true)}
-                className="flex-row items-center justify-between bg-zinc-50 rounded-lg px-4 py-4 border border-zinc-200"
+                className="flex-row items-center justify-between bg-zinc-50 rounded-xl px-4 py-5 border border-zinc-200"
                 activeOpacity={0.7}
                 disabled={isUpdating}
               >
