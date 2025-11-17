@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
   },
   accountsContainer: {
     marginTop: 30,
-    marginBottom: 100,
+    marginBottom: 120, // Aumentado de 100 a 120
+    paddingBottom: 20, // Padding adicional
   },
 });

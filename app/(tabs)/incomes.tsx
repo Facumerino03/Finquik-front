@@ -116,6 +116,8 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     marginTop: 30,
+    marginBottom: 120, // Espacio para la barra de navegación
+    paddingBottom: 20,
   },
   transactionsContainer: {
     marginTop: 30,
