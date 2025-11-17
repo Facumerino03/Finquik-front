@@ -27,7 +27,7 @@ export default function LoginScreen() {
   };
 
   const handleForgotPassword = () => {
-    // TODO: Implement forgot password functionality
+    router.push('/(auth)/forgot-password');
   };
 
   return (
