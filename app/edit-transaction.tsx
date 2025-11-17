@@ -55,6 +55,13 @@ export default function EditTransactionScreen() {
       setIsLoadingCategories(true);
       const data = await getCategoriesByType(selectedType);
       setCategories(data);
+      
+      // Si hay una transacción original y el tipo coincide, mantener la categoría seleccionada
+      if (originalTransaction && originalTransaction.category.type === selectedType) {
+        setSelectedCategoryId(originalTransaction.category.id);
+      } else {
+        setSelectedCategoryId(null);
+      }
     } catch (error) {
       console.error('Error loading categories:', error);
     } finally {
@@ -64,8 +71,6 @@ export default function EditTransactionScreen() {
 
   useEffect(() => {
     loadCategories();
-    // Reset category selection when type changes
-    setSelectedCategoryId(null);
   }, [selectedType, userToken]);
 
   // Cargar datos de la transacción original
@@ -432,8 +437,10 @@ export default function EditTransactionScreen() {
                       {/* SELECCIONADO - invertir colores */}
                       {isSelected && IconComponent && (
                         <View 
-                          className="w-9 h-9 rounded-full items-center justify-center"
+                          className="rounded-full items-center justify-center"
                           style={{
+                            width: 36,
+                            height: 36,
                             backgroundColor: category.iconColor || '#71717a',
                           }}
                         >
