@@ -11,7 +11,7 @@ import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary'
 
 export default function IncomesScreen() {
   const { incomeTransactions, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
-  const { categoryData, isLoading: categoriesLoading, error: categoriesError } = useCategoryData('INCOME', incomeTransactions);
+  const { categoryData, isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategoryData('INCOME', incomeTransactions);
   const { totalIncome } = useTransactionsSummary();
 
   const handleSeeAllPress = () => {
@@ -40,6 +40,7 @@ export default function IncomesScreen() {
         <View style={styles.content}>
           <CategoryChart 
             categories={categoryData}
+            totalAmount={totalIncome}
             size={320}
             strokeWidth={30}
             color="#00c950"
@@ -69,6 +70,8 @@ export default function IncomesScreen() {
             categories={categoryData}
             totalAmount={totalIncome}
             type="INCOME"
+            showTitle={false}
+            onRefresh={refetchCategories}
           />
         </View>
       </ScrollView>
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     marginTop: 30,
-    marginBottom: 120, // Espacio para la barra de navegación
+    marginBottom: 120,
     paddingBottom: 20,
   },
   transactionsContainer: {

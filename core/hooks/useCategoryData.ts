@@ -16,26 +16,26 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
   const [error, setError] = useState<string | null>(null);
   const { userToken } = useAuth();
 
-  useEffect(() => {
+  const fetchCategories = async () => {
     if (!userToken) {
       setIsLoading(false);
       return;
     }
 
-    const fetchCategories = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await getCategoriesByType(type);
-        setCategories(data);
-      } catch (err) {
-        setError('Failed to load categories');
-        console.error('useCategoryData error:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    try {
+      setIsLoading(true);
+      setError(null);
+      const data = await getCategoriesByType(type);
+      setCategories(data);
+    } catch (err) {
+      setError('Failed to load categories');
+      console.error('useCategoryData error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchCategories();
   }, [userToken, type]);
 
@@ -79,21 +79,10 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
     setCategoryData(data);
   }, [categories, transactions]);
 
-  return {
-    categoryData,
-    isLoading,
+  return { 
+    categoryData, 
+    isLoading, 
     error,
-    refresh: () => {
-      if (userToken) {
-        setIsLoading(true);
-        getCategoriesByType(type).then(data => {
-          setCategories(data);
-          setIsLoading(false);
-        }).catch(err => {
-          setError('Failed to load categories');
-          setIsLoading(false);
-        });
-      }
-    }
+    refetch: fetchCategories // Exportar la función de refetch
   };
 }

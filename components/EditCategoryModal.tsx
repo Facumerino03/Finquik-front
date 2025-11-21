@@ -26,6 +26,9 @@ export default function EditCategoryModal({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Verificar si es la categoría "Uncategorized"
+  const isUncategorized = category.name.toLowerCase() === 'uncategorized';
+
   // Pre-llenar datos cuando se carga la categoría
   useEffect(() => {
     if (category) {
@@ -47,7 +50,7 @@ export default function EditCategoryModal({
   };
 
   const handleUpdate = async () => {
-    if (!name.trim()) {
+    if (!isUncategorized && !name.trim()) {
       Alert.alert('Error', 'Please enter a category name');
       return;
     }
@@ -55,7 +58,7 @@ export default function EditCategoryModal({
     try {
       setIsUpdating(true);
       await updateCategory(category.id, {
-        name: name.trim(),
+        name: isUncategorized ? category.name : name.trim(),
         type: category.type,
         iconName: selectedIcon || undefined,
         iconColor: selectedColor || undefined,
@@ -73,6 +76,11 @@ export default function EditCategoryModal({
   };
 
   const handleDelete = () => {
+    if (isUncategorized) {
+      Alert.alert('Cannot Delete', 'The "Uncategorized" category cannot be deleted.');
+      return;
+    }
+
     Alert.alert(
       'Delete Category',
       `Are you sure you want to delete "${category.name}"? This will affect all associated transactions.`,
@@ -117,7 +125,7 @@ export default function EditCategoryModal({
             {/* Header */}
             <View className="flex-row items-center justify-between px-6 pt-10 pb-8">
               <Text className="text-2xl font-geist-semibold text-zinc-950">
-                Edit category
+                {isUncategorized ? 'Edit category icon' : 'Edit category'}
               </Text>
               <TouchableOpacity
                 onPress={handleClose}
@@ -164,14 +172,27 @@ export default function EditCategoryModal({
                 <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Category name
                 </Text>
-                <TextInput
-                  value={name}
-                  onChangeText={setName}
-                  placeholder="Enter category name"
-                  placeholderTextColor="#a1a1aa"
-                  className="bg-white border border-zinc-200 rounded-lg px-4 py-4 text-base font-geist text-zinc-950"
-                  editable={!isLoading}
-                />
+                {isUncategorized ? (
+                  <View className="bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-4">
+                    <Text className="text-base font-geist text-zinc-500">
+                      {name}
+                    </Text>
+                  </View>
+                ) : (
+                  <TextInput
+                    value={name}
+                    onChangeText={setName}
+                    placeholder="Enter category name"
+                    placeholderTextColor="#a1a1aa"
+                    className="bg-white border border-zinc-200 rounded-lg px-4 py-4 text-base font-geist text-zinc-950"
+                    editable={!isLoading}
+                  />
+                )}
+                {isUncategorized && (
+                  <Text className="text-xs font-geist text-zinc-400 mt-2">
+                    This is a default category and cannot be renamed
+                  </Text>
+                )}
               </View>
 
               {/* Category Type (Read Only) */}
@@ -200,25 +221,29 @@ export default function EditCategoryModal({
               {/* Delete Button */}
               <TouchableOpacity
                 onPress={handleDelete}
-                disabled={isLoading}
+                disabled={isLoading || isUncategorized}
                 className={`w-14 h-14 rounded-full items-center justify-center ${
-                  isLoading ? 'bg-red-200' : 'bg-red-500'
+                  isUncategorized ? 'bg-zinc-200' : isLoading ? 'bg-red-200' : 'bg-red-500'
                 }`}
-                activeOpacity={0.7}
+                activeOpacity={isUncategorized ? 1 : 0.7}
               >
                 {isDeleting ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
-                  <Trash2 size={22} color="#FFFFFF" strokeWidth={2} />
+                  <Trash2 
+                    size={22} 
+                    color={isUncategorized ? '#a1a1aa' : '#FFFFFF'} 
+                    strokeWidth={2} 
+                  />
                 )}
               </TouchableOpacity>
 
               {/* Save Button */}
               <TouchableOpacity
                 onPress={handleUpdate}
-                disabled={isLoading || !name.trim()}
+                disabled={isLoading || (!isUncategorized && !name.trim())}
                 className={`flex-1 py-4 rounded-lg ${
-                  isLoading || !name.trim()
+                  isLoading || (!isUncategorized && !name.trim())
                     ? 'bg-zinc-300'
                     : 'bg-zinc-950'
                 }`}

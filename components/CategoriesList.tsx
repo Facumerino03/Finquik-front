@@ -21,6 +21,7 @@ interface CategoriesListProps {
   totalAmount: number;
   type: 'INCOME' | 'EXPENSE';
   showTitle?: boolean;
+  onRefresh?: () => void; // Nuevo prop
 }
 
 const CategoriesList: React.FC<CategoriesListProps> = ({
@@ -28,6 +29,7 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
   totalAmount,
   type,
   showTitle = true,
+  onRefresh, // Nuevo prop
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -53,8 +55,10 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
   };
 
   const handleCategoryUpdated = () => {
-    // Aquí podrías refrescar la lista de categorías si es necesario
-    // Por ejemplo, llamar a un callback prop que refresque los datos
+    // Llamar al callback para refrescar los datos
+    if (onRefresh) {
+      onRefresh();
+    }
   };
 
   const CategoryItem = ({ categoryData, index }: { categoryData: CategoryData; index: number }) => {

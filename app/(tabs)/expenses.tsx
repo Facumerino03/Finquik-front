@@ -11,7 +11,7 @@ import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary'
 
 export default function ExpensesScreen() {
   const { expenseTransactions, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
-  const { categoryData, isLoading: categoriesLoading, error: categoriesError } = useCategoryData('EXPENSE', expenseTransactions);
+  const { categoryData, isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategoryData('EXPENSE', expenseTransactions);
   const { totalExpenses } = useTransactionsSummary();
 
   const handleSeeAllPress = () => {
@@ -40,6 +40,7 @@ export default function ExpensesScreen() {
         <View style={styles.content}>
           <CategoryChart 
             categories={categoryData}
+            totalAmount={totalExpenses}
             size={320}
             strokeWidth={30}
             color="#fb2c36"
@@ -69,6 +70,8 @@ export default function ExpensesScreen() {
             categories={categoryData}
             totalAmount={totalExpenses}
             type="EXPENSE"
+            showTitle={false}
+            onRefresh={refetchCategories}
           />
         </View>
       </ScrollView>
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
   },
   categoriesContainer: {
     marginTop: 30,
-    marginBottom: 120, // Espacio para la barra de navegación
+    marginBottom: 120,
     paddingBottom: 20,
   },
   transactionsContainer: {
