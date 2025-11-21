@@ -1,13 +1,12 @@
 import { Settings, UserRound } from 'lucide-react-native';
-import React from 'react';
-import { StatusBar, TouchableOpacity, View, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { StatusBar, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../core/contexts/AuthContext';
-import { router } from 'expo-router';
+import SettingsModal from './SettingsModal';
 
 export default function Header() {
   const insets = useSafeAreaInsets();
-  const { logout } = useAuth();
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const handleProfilePress = () => {
     // Navegar a perfil
@@ -15,21 +14,7 @@ export default function Header() {
   };
 
   const handleSettingsPress = () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro que quieres cerrar sesión?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Cerrar Sesión', 
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-            router.replace('/(auth)/login');
-          }
-        }
-      ]
-    );
+    setShowSettingsModal(true);
   };
 
   return (
@@ -44,8 +29,7 @@ export default function Header() {
           activeOpacity={0.7}
           className="p-1"
         >
-          <View className="w-11 h-11 	
-background-color: bg-zinc-950 rounded-full items-center justify-center">
+          <View className="w-11 h-11 bg-zinc-950 rounded-full items-center justify-center">
             <UserRound size={20} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
@@ -58,6 +42,12 @@ background-color: bg-zinc-950 rounded-full items-center justify-center">
           <Settings size={24} color="#09090b" />
         </TouchableOpacity>
       </View>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        visible={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+      />
     </>
   );
 }
