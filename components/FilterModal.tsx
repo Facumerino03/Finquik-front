@@ -383,9 +383,28 @@ export default function FilterModal({
                         activeOpacity={0.7}
                       >
                         <View className="flex-row items-center justify-between">
-                          <Text className="text-base font-geist text-zinc-950">
-                            {category.name}
-                          </Text>
+                          <View className="flex-row items-center flex-1">
+                            <Text className="text-base font-geist text-zinc-950 mr-2">
+                              {category.name}
+                            </Text>
+                            <View 
+                              className={`px-2 py-1 rounded-full ${
+                                category.type === 'INCOME' 
+                                  ? 'bg-green-100' 
+                                  : 'bg-red-100'
+                              }`}
+                            >
+                              <Text 
+                                className={`text-xs font-geist-medium ${
+                                  category.type === 'INCOME' 
+                                    ? 'text-green-700' 
+                                    : 'text-red-700'
+                                }`}
+                              >
+                                {category.type === 'INCOME' ? 'Income' : 'Expense'}
+                              </Text>
+                            </View>
+                          </View>
                           {selectedCategoryId === category.id && (
                             <Check size={16} color="#09090b" />
                           )}
