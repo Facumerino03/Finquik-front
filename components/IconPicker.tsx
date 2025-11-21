@@ -54,7 +54,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
       <TouchableOpacity
         key={iconName}
         onPress={() => handleSelectIcon(iconName)}
-        className="items-center justify-center rounded-2xl"
+        className="items-center justify-center rounded-full"
         style={{
           width: 52,
           height: 52,
@@ -65,7 +65,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
       >
         <IconComponent 
           size={26} 
-          color={isSelected ? tempSelectedColor : '#71717a'} 
+          color={isSelected ? tempSelectedColor : '#717176'} 
         />
       </TouchableOpacity>
     );
@@ -105,19 +105,17 @@ const IconPicker: React.FC<IconPickerProps> = ({
       <View className="flex-1 justify-end bg-black/50">
         <View className="bg-white rounded-t-3xl" style={{ height: '85%' }}>
           {/* Header */}
-          <View className="px-6 pt-8 pb-4">
-            <View className="flex-row items-center justify-between mb-6">
-              <Text className="text-2xl font-geist-semibold text-zinc-950">
-                Select Icon
-              </Text>
-              <TouchableOpacity
-                onPress={onClose}
-                className="w-10 h-10 items-center justify-center rounded-full bg-zinc-100"
-                activeOpacity={0.7}
-              >
-                <X size={20} color="#09090b" />
-              </TouchableOpacity>
-            </View>
+          <View className="flex-row items-center justify-between px-6 pt-10 pb-8">
+            <Text className="text-2xl font-geist-semibold text-zinc-950">
+              Select icon
+            </Text>
+            <TouchableOpacity
+              onPress={onClose}
+              className="w-8 h-8 items-center justify-center"
+              activeOpacity={0.7}
+            >
+              <X size={24} color="#09090b" />
+            </TouchableOpacity>
           </View>
 
           {/* Color Selector */}
@@ -137,21 +135,19 @@ const IconPicker: React.FC<IconPickerProps> = ({
           <ScrollView 
             className="flex-1 pt-4" 
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 20 }}
+            contentContainerStyle={{ paddingHorizontal: 25, paddingBottom: 100 }}
           >
-            <View className="flex-row flex-wrap justify-between">
+            <View className="flex-row flex-wrap">
               {AVAILABLE_ICONS.map(renderIcon)}
             </View>
-            
-            <View style={{ height: 100 }} />
           </ScrollView>
 
           {/* Confirm Button */}
-          <View className="px-6 pb-8 pt-4 bg-white border-t border-zinc-200">
+          <View className="px-6 pb-8 pt-4 bg-white">
             <TouchableOpacity
               onPress={handleConfirm}
               disabled={!tempSelectedIcon}
-              className={`py-4 rounded-2xl items-center ${
+              className={`py-4 rounded-lg items-center ${
                 tempSelectedIcon ? 'bg-zinc-950' : 'bg-zinc-200'
               }`}
               activeOpacity={0.8}
