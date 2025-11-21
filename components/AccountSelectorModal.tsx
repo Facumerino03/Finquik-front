@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react-native';
+import { Check, Plus, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Account } from '../core/types/transactions';
@@ -69,9 +69,7 @@ export default function AccountSelectorModal({
                     onSelectAccount(account.id);
                     onClose();
                   }}
-                  className={`flex-row items-center justify-between px-4 py-4 mb-3 rounded-2xl ${
-                    selectedAccountId === account.id ? 'bg-zinc-100' : 'bg-zinc-50'
-                  }`}
+                  className="flex-row items-center justify-between bg-zinc-50 rounded-xl px-4 py-5 mb-3 border border-zinc-200"
                   activeOpacity={0.7}
                 >
                   <View className="flex-row items-center flex-1">
@@ -97,10 +95,10 @@ export default function AccountSelectorModal({
 
                     {/* Account Info */}
                     <View className="ml-3 flex-1">
-                      <Text className="text-base font-geist-semibold text-zinc-950">
+                      <Text className="text-base font-geist-semibold text-zinc-950" numberOfLines={1}>
                         {account.name}
                       </Text>
-                      <Text className="text-lg font-geist-bold text-zinc-950 mt-1">
+                      <Text className="text-base font-geist-medium text-zinc-500 mt-1">
                         {formatCurrency(account.currentBalance)}
                       </Text>
                     </View>
@@ -108,7 +106,7 @@ export default function AccountSelectorModal({
 
                   {/* Check Icon */}
                   {selectedAccountId === account.id && (
-                    <Check size={20} color="#09090b" />
+                    <Check size={20} color="#09090b" strokeWidth={2.5} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -116,17 +114,13 @@ export default function AccountSelectorModal({
               {/* Create New Account Button */}
               <TouchableOpacity
                 onPress={handleCreateAccount}
-                className="flex-row items-center px-4 py-4 rounded-2xl border-2 border-dashed border-zinc-300 bg-white mt-2"
+                className="flex-row items-center rounded-xl px-4 py-5 border-2 border-dashed border-zinc-300 mt-2"
                 activeOpacity={0.7}
               >
                 <View 
-                  className="rounded-full bg-zinc-100 items-center justify-center"
-                  style={{ 
-                    width: 40, 
-                    height: 40,
-                  }}
+                  className="w-11 h-11 rounded-full bg-zinc-100 items-center justify-center"
                 >
-                  <Text className="text-2xl font-geist-bold text-zinc-950">+</Text>
+                  <Plus size={20} color="#09090b" strokeWidth={2.5} />
                 </View>
 
                 <Text className="ml-3 text-base font-geist-semibold text-zinc-950">

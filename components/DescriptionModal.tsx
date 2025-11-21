@@ -51,8 +51,8 @@ export default function DescriptionModal({
               value={localDescription}
               onChangeText={setLocalDescription}
               placeholder="Enter a note for this transaction..."
-              placeholderTextColor="#71717b"
-              className="bg-zinc-50 rounded-2xl px-4 py-4 text-base font-geist text-zinc-950"
+              placeholderTextColor="#a1a1aa"
+              className="bg-white border border-zinc-200 rounded-lg px-4 py-4 text-base font-geist text-zinc-950"
               multiline
               numberOfLines={6}
               textAlignVertical="top"

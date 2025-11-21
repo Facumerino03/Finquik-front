@@ -287,7 +287,9 @@ export default function AddTransactionScreen() {
                 <Text className="text-lg font-geist text-zinc-500">
                   {formatDateForDisplay(selectedDate)}
                 </Text>
-                <Pencil size={18} color="#71717a" style={{ marginLeft: 8 }} />
+                <View className="w-8 h-8 rounded-full bg-zinc-100 items-center justify-center ml-2">
+                  <Pencil size={12} color="#71717a" strokeWidth={2} />
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -297,40 +299,34 @@ export default function AddTransactionScreen() {
 
           {/* Bottom Section - Description, Account, Category and Submit */}
           <View className="px-5 pb-8">
-            {/* Add Note Pill */}
+            {/* Add Note Button */}
             <View className="mb-6 items-center">
               <TouchableOpacity
                 onPress={() => setShowDescriptionModal(true)}
-                className={`flex-row items-center pl-3 pr-4 py-2 rounded-full ${
-                  description 
-                    ? 'bg-zinc-950' 
-                    : 'bg-white border border-zinc-200'
-                }`}
+                className="flex-row items-center rounded-full"
+                style={{
+                  backgroundColor: description ? '#f4f4f5' : '#ffffff',
+                  borderWidth: 1,
+                  borderColor: description ? '#09090b' : '#e4e4e7',
+                  paddingLeft: 4,
+                  paddingRight: 12,
+                  paddingVertical: 4,
+                }}
                 activeOpacity={0.7}
-                style={{ height: 48 }}
               >
-                {/* Icon Container */}
-                <View 
-                  className="rounded-full items-center justify-center mr-3"
-                  style={{ 
-                    width: 36,
-                    height: 36,
-                    backgroundColor: description ? '#ffffff' : '#f4f4f5'
+                <View
+                  className="w-9 h-9 rounded-full items-center justify-center"
+                  style={{
+                    backgroundColor: description ? '#09090b' : '#f4f4f5',
                   }}
                 >
-                  <FileText 
-                    size={16} 
-                    color={description ? '#09090b' : '#71717b'} 
+                  <FileText
+                    size={15}
+                    color={description ? '#f4f4f5' : '#09090b'}
+                    strokeWidth={2}
                   />
                 </View>
-                
-                {/* Text */}
-                <Text 
-                  className={`text-base font-geist-medium ${
-                    description ? 'text-white' : 'text-zinc-500'
-                  }`}
-                  numberOfLines={1}
-                >
+                <Text className="text-sm font-geist-medium text-zinc-600 ml-2" numberOfLines={1}>
                   {description || 'Add note'}
                 </Text>
               </TouchableOpacity>
@@ -341,7 +337,7 @@ export default function AddTransactionScreen() {
               {accounts.length > 0 ? (
                 <TouchableOpacity
                   onPress={() => setShowAccountModal(true)}
-                  className="flex-row items-center justify-between bg-zinc-50 rounded-2xl px-4 py-4"
+                  className="flex-row items-center justify-between bg-zinc-50 rounded-xl px-4 py-5 border border-zinc-200"
                   activeOpacity={0.7}
                 >
                   <View className="flex-1 flex-row items-center">
@@ -372,7 +368,7 @@ export default function AddTransactionScreen() {
                       <Text className="text-base font-geist-semibold text-zinc-950" numberOfLines={1}>
                         {getSelectedAccountName()}
                       </Text>
-                      <Text className="text-lg font-geist-bold text-zinc-950 mt-1">
+                      <Text className="text-base font-geist-medium text-zinc-500 mt-1">
                         {getSelectedAccountBalance()}
                       </Text>
                     </View>
@@ -382,7 +378,7 @@ export default function AddTransactionScreen() {
                   <ChevronDown size={24} color="#09090b" />
                 </TouchableOpacity>
               ) : (
-                <View className="bg-zinc-50 rounded-2xl px-4 py-6 items-center">
+                <View className="bg-zinc-50 rounded-lg px-4 py-6 items-center border border-zinc-200">
                   <Text className="text-base font-geist text-zinc-500">
                     No accounts available
                   </Text>
