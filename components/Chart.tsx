@@ -86,14 +86,12 @@ const Chart: React.FC<ChartProps> = ({
     
     return normalizedAngle >= normalizedStart && normalizedAngle <= normalizedEnd;
   };
-  
-  // Calcular los ángulos de los segmentos
+
   let incomeStartAngle, incomeEndAngle, expensesStartAngle, expensesEndAngle;
   
   if (total === 0) {
     incomeStartAngle = incomeEndAngle = expensesStartAngle = expensesEndAngle = 0;
   } else if (income > 0 && expenses > 0) {
-    // Ambos tipos presentes - aplicar gap
     const availableAngle = totalAngle - gapAngle;
     const incomeAngle = (income / total) * availableAngle;
     const expensesAngle = (expenses / total) * availableAngle;
@@ -103,12 +101,10 @@ const Chart: React.FC<ChartProps> = ({
     expensesStartAngle = incomeEndAngle + gapAngle;
     expensesEndAngle = expensesStartAngle + expensesAngle;
   } else if (income > 0) {
-    // Solo ingresos - ocupar todo el semicírculo
     incomeStartAngle = startAngle;
     incomeEndAngle = endAngle;
     expensesStartAngle = expensesEndAngle = 0;
   } else if (expenses > 0) {
-    // Solo gastos - ocupar todo el semicírculo
     expensesStartAngle = startAngle;
     expensesEndAngle = endAngle;
     incomeStartAngle = incomeEndAngle = 0;
@@ -132,7 +128,6 @@ const Chart: React.FC<ChartProps> = ({
     centerY
   );
 
-  // Crear arco completo gris para estado vacío
   const emptyStatePath = createArcPath(
     startAngle,
     endAngle,
@@ -168,9 +163,8 @@ const Chart: React.FC<ChartProps> = ({
     
     return '#e4e4e7';
   };
-  
+
   const getCenterContent = () => {
-    // Si no hay transacciones, mostrar mensaje de estado vacío
     if (total === 0) {
       return { value: 0, label: 'Start adding your first transaction' };
     }
@@ -194,8 +188,7 @@ const Chart: React.FC<ChartProps> = ({
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(Math.abs(amount));
-    
-    // Solo agregar signo - cuando el balance es negativo
+
     if (selectedSegment === 'none' && balance < 0) {
       return `-${formatted}`;
     }
@@ -203,13 +196,11 @@ const Chart: React.FC<ChartProps> = ({
     return formatted;
   };
 
-  // Determinar el color del texto del balance
   const getBalanceColor = () => {
     if (selectedSegment !== 'none' || total === 0) {
-      return '#09090b'; // Color por defecto
+      return '#09090b';
     }
-    
-    // Solo cambiar a rojo cuando el balance es negativo
+
     return balance < 0 ? '#fb2c36' : '#09090b';
   };
 
@@ -220,7 +211,6 @@ const Chart: React.FC<ChartProps> = ({
           <TouchableWithoutFeedback onPress={handleSvgTouch}>
             <Svg width={size} height={size * 0.6} viewBox={`0 0 ${size} ${size * 0.6}`}>
               <G>
-                {/* Estado vacío: arco completo gris */}
                 {total === 0 && (
                   <Path
                     d={emptyStatePath}
@@ -230,8 +220,7 @@ const Chart: React.FC<ChartProps> = ({
                     fill="none"
                   />
                 )}
-                
-                {/* Segmento de ingresos */}
+
                 {income > 0 && (
                   <Path
                     d={incomePath}
@@ -241,8 +230,7 @@ const Chart: React.FC<ChartProps> = ({
                     fill="none"
                   />
                 )}
-                
-                {/* Segmento de gastos */}
+
                 {expenses > 0 && (
                   <Path
                     d={expensesPath}
@@ -255,8 +243,7 @@ const Chart: React.FC<ChartProps> = ({
               </G>
             </Svg>
           </TouchableWithoutFeedback>
-          
-          {/* Contenido central */}
+
           <TouchableWithoutFeedback onPress={handleContainerTouch}>
             <View style={styles.centerContent}>
               <Text style={[

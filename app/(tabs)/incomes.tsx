@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
-import React from 'react';
-import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CategoriesList from '../../components/CategoriesList';
 import CategoryChart from '../../components/CategoryChart';
+import CreateCategoryModal from '../../components/CreateCategoryModal';
 import Header from '../../components/Header';
 import TransactionsList from '../../components/TransactionsList';
 import { useCategoryData } from '../../core/hooks/useCategoryData';
@@ -13,9 +14,14 @@ export default function IncomesScreen() {
   const { incomeTransactions, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
   const { categoryData, isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategoryData('INCOME', incomeTransactions);
   const { totalIncome } = useTransactionsSummary();
+  const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
 
   const handleSeeAllPress = () => {
     router.push('/all-transactions');
+  };
+
+  const handleCategoryCreated = () => {
+    refetchCategories();
   };
 
   const isLoading = transactionsLoading || categoriesLoading;
@@ -34,48 +40,74 @@ export default function IncomesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Header />
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <CategoryChart 
-            categories={categoryData}
-            totalAmount={totalIncome}
-            size={320}
-            strokeWidth={30}
-            color="#00c950"
-          />
-        </View>
-        
-        {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
+    <>
+      <SafeAreaView style={styles.container}>
+        <Header />
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.content}>
+            <CategoryChart 
+              categories={categoryData}
+              totalAmount={totalIncome}
+              size={320}
+              strokeWidth={30}
+              color="#00c950"
+            />
           </View>
-        )}
-        
-        {/* Transactions List */}
-        <View style={styles.transactionsContainer}>
-          <TransactionsList
-            transactions={incomeTransactions}
-            showAllButton={true}
-            onSeeAllPress={handleSeeAllPress}
-            maxItems={10}
-            emptyStateType="incomes"
-          />
-        </View>
+          
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+          
+          {/* Transactions List */}
+          <View style={styles.transactionsContainer}>
+            <TransactionsList
+              transactions={incomeTransactions}
+              showAllButton={true}
+              onSeeAllPress={handleSeeAllPress}
+              maxItems={10}
+              emptyStateType="incomes"
+            />
+          </View>
 
-        {/* Categories List */}
-        <View style={styles.categoriesContainer}>
-          <CategoriesList
-            categories={categoryData}
-            totalAmount={totalIncome}
-            type="INCOME"
-            showTitle={false}
-            onRefresh={refetchCategories}
-          />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          {/* Categories Section with Header */}
+          <View style={styles.categoriesContainer}>
+            {/* Categories Header */}
+            <View className="flex-row justify-between items-center px-5 mb-6">
+              <Text className="text-zinc-950 text-2xl font-geist-semibold">
+                Categories
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowCreateCategoryModal(true)}
+                activeOpacity={0.7}
+              >
+                <Text className="text-zinc-500 text-base font-geist-medium">
+                  Add new
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Categories List */}
+            <CategoriesList
+              categories={categoryData}
+              totalAmount={totalIncome}
+              type="INCOME"
+              showTitle={false}
+              onRefresh={refetchCategories}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+
+      {/* Create Category Modal */}
+      <CreateCategoryModal
+        visible={showCreateCategoryModal}
+        onClose={() => setShowCreateCategoryModal(false)}
+        categoryType="INCOME"
+        onCategoryCreated={handleCategoryCreated}
+      />
+    </>
   );
 }
 

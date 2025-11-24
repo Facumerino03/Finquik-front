@@ -71,12 +71,12 @@ export default function PasswordStrengthIndicator({ password }: PasswordStrength
 
   return (
     <View className="mt-2">
-      {/* Barras de fortaleza */}
+      {/* Strength bar */}
       <View className="flex-row mb-2">
         {renderStrengthBars()}
       </View>
       
-      {/* Texto descriptivo */}
+      {/* Descriptive text */}
       <Text className="text-sm text-zinc-500 font-geist">
         Use 8 or more characters, including letters, numbers and symbols
       </Text>

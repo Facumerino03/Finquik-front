@@ -13,7 +13,6 @@ export function useCreateTransaction() {
       setIsLoading(true);
       setError(null);
       await createTransaction(transactionData);
-      // Refrescar todos los datos después de crear
       await refresh();
     } catch (err) {
       setError('Failed to create transaction');

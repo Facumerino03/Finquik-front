@@ -46,7 +46,6 @@ export default function AccountsList({ accounts, totalBalance }: AccountsListPro
             containerSize={40}
           />
         ) : (
-          // Fallback: círculo con color sólido si no hay icono
           <View
             className="rounded-full"
             style={{

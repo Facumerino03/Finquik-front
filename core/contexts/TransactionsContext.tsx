@@ -11,7 +11,7 @@ import { Account, Transaction } from "../types/transactions";
 import { useAuth } from "./AuthContext";
 
 interface TransactionsContextType {
-  // Datos
+  // Data
   transactions: Transaction[];
   incomeTransactions: Transaction[];
   expenseTransactions: Transaction[];
@@ -20,11 +20,11 @@ interface TransactionsContextType {
   totalExpenses: number;
   balance: number;
   
-  // Estados
+  // States
   isLoading: boolean;
   error: string | null;
   
-  // Acciones
+  // Actions
   refresh: () => Promise<void>;
   refreshAccounts: () => Promise<void>;
 }
@@ -57,14 +57,12 @@ export const TransactionsProvider: React.FC<TransactionsProviderProps> = ({ chil
     try {
       setError(null);
       
-      // Obtener todas las transacciones en paralelo
       const [allData, incomeData, expenseData] = await Promise.all([
         getAllTransactions(),
         getIncomeTransactions(),
         getExpenseTransactions()
       ]);
 
-      // Ordenar por fecha (más reciente primero)
       const sortByDate = (a: Transaction, b: Transaction) => 
         new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime();
 

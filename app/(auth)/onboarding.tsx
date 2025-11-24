@@ -19,17 +19,13 @@ export default function OnboardingScreen() {
     
     const timeout = setTimeout(() => {
       if (!isDeleting && text === currentWord) {
-        // Palabra completa, esperar y empezar a borrar
         setTimeout(() => setIsDeleting(true), 1500);
       } else if (isDeleting && text === '') {
-        // Palabra borrada, cambiar a la siguiente
         setIsDeleting(false);
         setWordIndex((prev) => (prev + 1) % words.length);
       } else if (isDeleting) {
-        // Borrando
         setText(currentWord.substring(0, text.length - 1));
       } else {
-        // Escribiendo
         setText(currentWord.substring(0, text.length + 1));
       }
     }, isDeleting ? 50 : 100);

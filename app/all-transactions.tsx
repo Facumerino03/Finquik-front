@@ -25,7 +25,7 @@ export default function AllTransactionsScreen() {
   const { categories, isLoading: isLoadingCategories } = useCategories();
   const insets = useSafeAreaInsets();
 
-  // Búsqueda solo cuando cambian los filtros (no por debounce)
+  // Search only when filters change (not by debounce)
   useEffect(() => {
     if (Object.keys(currentFilters).length > 0) {
       handleSearch();
@@ -72,7 +72,6 @@ export default function AllTransactionsScreen() {
     if (searchQuery.trim()) {
       handleSearch();
     } else {
-      // Si no hay texto de búsqueda, limpiar filtros
       setIsFiltered(false);
       setFilteredTransactions([]);
     }
@@ -142,11 +141,11 @@ export default function AllTransactionsScreen() {
             All transactions
           </Text>
           
-          {/* Espacio vacío para centrar el título */}
+          {/* Empty space to center the title */}
           <View className="w-10" />
         </View>
 
-        {/* Search Bar y Filter */}
+        {/* Search Bar and Filter */}
         <View className="flex-row items-center px-5 py-4">
           {/* Search Bar */}
           {showSearchInput ? (
@@ -218,7 +217,7 @@ export default function AllTransactionsScreen() {
               maxItems={displayTransactions.length}
               emptyStateType="all"
               isFiltered={isFiltered}
-              clickable={true} // Agregar esta línea
+              clickable={true}
             />
           </View>
         </ScrollView>

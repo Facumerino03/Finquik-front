@@ -35,9 +35,8 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
   const endAngle = 360;
   const totalAngle = 180;
   const gapAngle = 15;
-  
-  // Área táctil extendida para segmentos pequeños (en grados)
-  const minTouchAngle = 10; // Mínimo 10 grados para toques precisos
+
+  const minTouchAngle = 10;
   
   const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
   
@@ -70,10 +69,9 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
     const dx = x - centerX;
     const dy = y - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    // Área táctil más amplia: desde el centro hasta más allá del borde exterior
-    const innerRadius = 0; // Permitir toques desde el centro
-    const outerRadius = radius + strokeWidth; // Ampliar área táctil externa
+
+    const innerRadius = 0;
+    const outerRadius = radius + strokeWidth;
     
     if (distance < innerRadius || distance > outerRadius) {
       return false;
@@ -81,14 +79,12 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
     
     let angle = Math.atan2(dy, dx) * (180 / Math.PI);
     if (angle < 0) angle += 360;
-    
-    // Expandir el área táctil para segmentos pequeños
+
     const segmentAngle = endAngleDeg - startAngleDeg;
     let touchStartAngle = startAngleDeg;
     let touchEndAngle = endAngleDeg;
-    
+
     if (segmentAngle < minTouchAngle) {
-      // Expandir el área táctil simétricamente
       const expansion = (minTouchAngle - segmentAngle) / 2;
       touchStartAngle -= expansion;
       touchEndAngle += expansion;
@@ -138,8 +134,7 @@ const CategoryChart: React.FC<CategoryChartProps> = ({
   
   const handleSvgTouch = (event: any) => {
     const { locationX, locationY } = event.nativeEvent;
-    
-    // Buscar en orden inverso para dar prioridad a segmentos más cercanos al toque
+
     for (let i = segments.length - 1; i >= 0; i--) {
       const segment = segments[i];
       if (isPointInArc(locationX, locationY, segment.startAngle, segment.endAngle)) {

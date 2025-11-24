@@ -11,22 +11,10 @@ export default function HomeScreen() {
   const { totalIncome, totalExpenses, balance, isLoading, error } = useTransactionsSummary();
   const { recentTransactions, isLoading: transactionsLoading, error: transactionsError } = useTransactions();
 
-  console.log('HomeScreen data:', { 
-    totalIncome, 
-    totalExpenses, 
-    balance, 
-    isLoading, 
-    error,
-    transactionsCount: recentTransactions.length,
-    transactionsLoading,
-    transactionsError
-  });
-
   const handleSeeAllPress = () => {
     router.push('/all-transactions');
   };
 
-  // Mostrar loading si están cargando los datos principales
   if (isLoading || transactionsLoading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -52,7 +40,7 @@ export default function HomeScreen() {
           />
         </View>
         
-        {/* Mostrar error si hay problemas con las transacciones */}
+        {/* Show error if there are problems with transactions */}
         {transactionsError && (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{transactionsError}</Text>
@@ -114,7 +102,7 @@ const styles = StyleSheet.create({
   },
   transactionsContainer: {
     marginTop: 30,
-    marginBottom: 120, // Aumentado de 100 a 120
-    paddingBottom: 20, // Padding adicional
+    marginBottom: 120,
+    paddingBottom: 20,
   },
 });

@@ -166,7 +166,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
               className="flex-1 px-6"
               showsVerticalScrollIndicator={false}
             >
-              {/* Icon Display - Grande y centrado */}
+              {/* Icon Display */}
               <View className="items-center mb-8">
                 <TouchableOpacity
                   onPress={() => setShowIconPicker(true)}

@@ -1,8 +1,8 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import * as LucideIcons from 'lucide-react-native';
 import { ArrowLeft, ChevronDown, FileText, Pencil, Plus } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -40,11 +40,11 @@ export default function AddTransactionScreen() {
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const { userToken, isLoading: authLoading } = useAuth();
-  const { accounts, isLoading: accountsLoading } = useAccounts();
+  const { accounts, isLoading: accountsLoading, refresh: refreshAccounts } = useAccounts();
   const { createTransaction, isLoading: isCreating } = useCreateTransaction();
   const insets = useSafeAreaInsets();
 
-  // Cargar categorías según el tipo seleccionado
+  // Load categories based on selected type
   const loadCategories = async () => {
     if (!userToken) return;
 
@@ -61,16 +61,21 @@ export default function AddTransactionScreen() {
 
   useEffect(() => {
     loadCategories();
-    // Reset category selection when type changes
     setSelectedCategoryId(null);
   }, [selectedType, userToken]);
 
-  // Seleccionar la primera cuenta por defecto
   useEffect(() => {
     if (accounts.length > 0 && selectedAccountId === null) {
       setSelectedAccountId(accounts[0].id);
     }
   }, [accounts]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCategories();
+      refreshAccounts();
+    }, [selectedType])
+  );
 
   const handleBackPress = () => {
     router.back();
@@ -99,9 +104,7 @@ export default function AddTransactionScreen() {
   };
 
   const handleAmountChange = (text: string) => {
-    // Remover el símbolo $ si el usuario lo escribe
     let cleanedText = text.replace(/\$/g, '');
-    // Remover cualquier carácter que no sea número o punto decimal
     cleanedText = cleanedText.replace(/[^0-9.]/g, '');
     setAmount(cleanedText);
   };
@@ -158,7 +161,6 @@ export default function AddTransactionScreen() {
         {
           text: 'OK',
           onPress: () => {
-            // Reset form
             setAmount('');
             setSelectedDate(new Date());
             setSelectedAccountId(accounts.length > 0 ? accounts[0].id : null);
@@ -203,7 +205,7 @@ export default function AddTransactionScreen() {
             Add transactions
           </Text>
 
-          {/* Espacio vacío para centrar el título */}
+          {/* Empty space to center the title */}
           <View className="w-10" />
         </View>
 
@@ -411,11 +413,9 @@ export default function AddTransactionScreen() {
                   {categories.map((category) => {
                     const isSelected = selectedCategoryId === category.id;
                     
-                    // Buscar el color de fondo en AVAILABLE_COLORS
                     const colorConfig = AVAILABLE_COLORS.find(c => c.value === category.iconColor);
                     const bgColor = colorConfig?.bg || '#f4f4f5';
-                    
-                    // Obtener el componente de icono de Lucide
+
                     const IconComponent = LucideIcons[category.iconName as keyof typeof LucideIcons] as React.ComponentType<any>;
                     
                     return (
@@ -435,7 +435,7 @@ export default function AddTransactionScreen() {
                         }}
                         activeOpacity={0.7}
                       >
-                        {/* NO seleccionado */}
+                        {/* NOT selected */}
                         {!isSelected && (
                           <CategoryIcon
                             iconName={category.iconName}
@@ -445,7 +445,7 @@ export default function AddTransactionScreen() {
                           />
                         )}
                         
-                        {/* SELECCIONADO - invertir colores */}
+                        {/* SELECTED - invert colors */}
                         {isSelected && IconComponent && (
                           <View 
                             className="rounded-full items-center justify-center"

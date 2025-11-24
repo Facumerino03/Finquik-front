@@ -82,7 +82,6 @@ export default function AccountSelectorModal({
                         containerSize={40}
                       />
                     ) : (
-                      // Fallback: círculo con color sólido si no hay icono
                       <View 
                         className="rounded-full"
                         style={{ 

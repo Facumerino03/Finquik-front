@@ -7,29 +7,27 @@ interface CategoryIconProps {
   iconName?: string | null;
   iconColor?: string | null;
   size?: number;
-  containerSize?: number; // Nuevo prop para tamaño fijo del contenedor
+  containerSize?: number;
 }
 
 const CategoryIcon: React.FC<CategoryIconProps> = ({
   iconName,
   iconColor,
   size = 24,
-  containerSize, // Si se proporciona, usa este tamaño fijo
+  containerSize,
 }) => {
-  // Buscar el componente del ícono
   const IconComponent = iconName 
     ? (LucideIcons[iconName as keyof typeof LucideIcons] as any)
     : null;
 
-  // Obtener el color de fondo basado en el iconColor
   const getBackgroundColor = () => {
-    if (!iconColor) return '#f4f4f5'; // zinc-100 por defecto
+    if (!iconColor) return '#f4f4f5';
     
     const color = AVAILABLE_COLORS.find(c => c.value === iconColor);
     return color ? color.bg : '#f4f4f5';
   };
 
-  const color = iconColor || '#71717a'; // zinc-500 por defecto
+  const color = iconColor || '#71717a';
   const backgroundColor = getBackgroundColor();
   const finalSize = containerSize || size * 2.33;
 
@@ -45,7 +43,6 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({
       {IconComponent ? (
         <IconComponent size={size} color={color} />
       ) : (
-        // Fallback: ícono de ayuda
         <LucideIcons.HelpCircle size={size} color={color} />
       )}
     </View>

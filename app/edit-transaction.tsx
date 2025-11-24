@@ -47,7 +47,7 @@ export default function EditTransactionScreen() {
   const { updateTransaction, isLoading: isUpdating } = useUpdateTransaction();
   const insets = useSafeAreaInsets();
 
-  // Cargar categorías según el tipo seleccionado
+  // Load categories based on selected type
   const loadCategories = async () => {
     if (!userToken) return;
 
@@ -55,8 +55,7 @@ export default function EditTransactionScreen() {
       setIsLoadingCategories(true);
       const data = await getCategoriesByType(selectedType);
       setCategories(data);
-      
-      // Si hay una transacción original y el tipo coincide, mantener la categoría seleccionada
+
       if (originalTransaction && originalTransaction.category.type === selectedType) {
         setSelectedCategoryId(originalTransaction.category.id);
       } else {
@@ -73,7 +72,7 @@ export default function EditTransactionScreen() {
     loadCategories();
   }, [selectedType, userToken]);
 
-  // Cargar datos de la transacción original
+  // Load original transaction data
   useEffect(() => {
     const loadTransaction = async () => {
       if (transactionId) {
@@ -93,7 +92,7 @@ export default function EditTransactionScreen() {
     loadTransaction();
   }, [transactionId]);
 
-  // Pre-llenar formulario cuando se carga la transacción
+  // Pre-fill form when transaction is loaded
   useEffect(() => {
     if (originalTransaction) {
       setAmount(originalTransaction.amount.toString());
@@ -121,7 +120,7 @@ export default function EditTransactionScreen() {
   };
 
   const formatDateToString = (date: Date): string => {
-    return date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    return date.toISOString().split('T')[0]; // format YYYY-MM-DD
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -337,7 +336,6 @@ export default function EditTransactionScreen() {
                 disabled={isUpdating}
               >
                 <View className="flex-1 flex-row items-center">
-                  {/* Account Icon */}
                   {(() => {
                     const selectedAccount = accounts.find(acc => acc.id === selectedAccountId);
                     return selectedAccount?.iconName && selectedAccount?.iconColor ? (
@@ -359,7 +357,6 @@ export default function EditTransactionScreen() {
                     );
                   })()}
 
-                  {/* Account Name and Balance */}
                   <View className="ml-3 flex-1">
                     <Text className="text-base font-geist-semibold text-zinc-950" numberOfLines={1}>
                       {getSelectedAccountName()}
@@ -370,7 +367,6 @@ export default function EditTransactionScreen() {
                   </View>
                 </View>
 
-                {/* Dropdown Arrow */}
                 <ChevronDown size={24} color="#09090b" />
               </TouchableOpacity>
             ) : (
@@ -399,12 +395,10 @@ export default function EditTransactionScreen() {
               >
                 {categories.map((category) => {
                   const isSelected = selectedCategoryId === category.id;
-                  
-                  // Buscar el color de fondo en AVAILABLE_COLORS
+
                   const colorConfig = AVAILABLE_COLORS.find(c => c.value === category.iconColor);
                   const bgColor = colorConfig?.bg || '#f4f4f5';
-                  
-                  // Obtener el componente de icono de Lucide
+
                   const IconComponent = LucideIcons[category.iconName as keyof typeof LucideIcons] as React.ComponentType<any>;
                   
                   return (
@@ -424,7 +418,6 @@ export default function EditTransactionScreen() {
                       activeOpacity={0.7}
                       disabled={isUpdating}
                     >
-                      {/* NO seleccionado */}
                       {!isSelected && (
                         <CategoryIcon
                           iconName={category.iconName}
@@ -433,8 +426,7 @@ export default function EditTransactionScreen() {
                           containerSize={36}
                         />
                       )}
-                      
-                      {/* SELECCIONADO - invertir colores */}
+
                       {isSelected && IconComponent && (
                         <View 
                           className="rounded-full items-center justify-center"
@@ -451,8 +443,7 @@ export default function EditTransactionScreen() {
                           />
                         </View>
                       )}
-                      
-                      {/* Category Name */}
+
                       <Text className="text-sm font-geist-medium text-zinc-600 ml-2">
                         {category.name}
                       </Text>

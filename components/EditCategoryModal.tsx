@@ -26,10 +26,8 @@ export default function EditCategoryModal({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Verificar si es la categoría "Uncategorized"
   const isUncategorized = category.name.toLowerCase() === 'uncategorized';
 
-  // Pre-llenar datos cuando se carga la categoría
   useEffect(() => {
     if (category) {
       setName(category.name);
@@ -142,7 +140,6 @@ export default function EditCategoryModal({
               className="flex-1 px-6"
               showsVerticalScrollIndicator={false}
             >
-              {/* Icon Display - Grande y centrado */}
               <View className="items-center mb-8">
                 <TouchableOpacity
                   onPress={() => setShowIconPicker(true)}
@@ -167,7 +164,6 @@ export default function EditCategoryModal({
                 </Text>
               </View>
 
-              {/* Category Name */}
               <View className="mb-8">
                 <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Category name
@@ -195,7 +191,6 @@ export default function EditCategoryModal({
                 )}
               </View>
 
-              {/* Category Type (Read Only) */}
               <View className="mb-8">
                 <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Category type
@@ -216,9 +211,7 @@ export default function EditCategoryModal({
               </View>
             </ScrollView>
 
-            {/* Save and Delete Buttons */}
             <View className="px-6 pb-8 pt-4 flex-row gap-3">
-              {/* Delete Button */}
               <TouchableOpacity
                 onPress={handleDelete}
                 disabled={isLoading || isUncategorized}
@@ -238,7 +231,6 @@ export default function EditCategoryModal({
                 )}
               </TouchableOpacity>
 
-              {/* Save Button */}
               <TouchableOpacity
                 onPress={handleUpdate}
                 disabled={isLoading || (!isUncategorized && !name.trim())}
@@ -267,7 +259,6 @@ export default function EditCategoryModal({
         </View>
       </Modal>
 
-      {/* Icon Picker Modal */}
       <IconPicker
         visible={showIconPicker}
         onClose={() => setShowIconPicker(false)}

@@ -188,7 +188,7 @@ export default function EditAccountModal({ visible, account, onClose }: EditAcco
               className="flex-1 px-6"
               showsVerticalScrollIndicator={false}
             >
-              {/* Icon Display - Grande y centrado */}
+              {/* Icon Display */}
               <View className="items-center mb-8">
                 <TouchableOpacity
                   onPress={() => setShowIconPicker(true)}

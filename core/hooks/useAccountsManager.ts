@@ -15,13 +15,12 @@ export function useAccountsManager() {
 
   const { refreshAccounts } = useTransactions();
 
-  // Crear una nueva cuenta
   const createAccount = async (accountData: CreateAccountPayload) => {
     setIsCreating(true);
     setError(null);
     try {
       const newAccount = await createAccountService(accountData);
-      await refreshAccounts(); // Refrescar la lista de cuentas
+      await refreshAccounts(); 
       return newAccount;
     } catch (err) {
       const errorMessage = 'Failed to create account';
@@ -32,13 +31,12 @@ export function useAccountsManager() {
     }
   };
 
-  // Actualizar una cuenta existente
   const updateAccount = async (accountId: number, accountData: UpdateAccountPayload) => {
     setIsUpdating(true);
     setError(null);
     try {
       const updatedAccount = await updateAccountService(accountId, accountData);
-      await refreshAccounts(); // Refrescar la lista de cuentas
+      await refreshAccounts(); 
       return updatedAccount;
     } catch (err) {
       const errorMessage = 'Failed to update account';
@@ -49,13 +47,12 @@ export function useAccountsManager() {
     }
   };
 
-  // Eliminar una cuenta
   const deleteAccount = async (accountId: number) => {
     setIsDeleting(true);
     setError(null);
     try {
       await deleteAccountService(accountId);
-      await refreshAccounts(); // Refrescar la lista de cuentas
+      await refreshAccounts();
     } catch (err) {
       const errorMessage = 'Failed to delete account';
       setError(errorMessage);

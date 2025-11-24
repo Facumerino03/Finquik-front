@@ -13,7 +13,6 @@ export function useUpdateTransaction() {
       setIsLoading(true);
       setError(null);
       await updateTransaction(transactionId, transactionData);
-      // Refrescar todos los datos después de actualizar
       await refresh();
     } catch (err) {
       setError('Failed to update transaction');

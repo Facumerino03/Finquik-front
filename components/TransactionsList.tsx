@@ -13,8 +13,8 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   emptyStateType = 'all',
   showTitle = true,
   isFiltered = false,
-  clickable = false, // Nuevo prop para hacer las transacciones clickeables
-  onTransactionPress // Nuevo prop para manejar el click
+  clickable = false,
+  onTransactionPress
 }) => {
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -76,8 +76,6 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
-    // TODO: Implementar navegación a pantalla de edición
-    console.log('Edit transaction:', transaction);
   };
 
   const handleCloseModal = () => {
@@ -88,7 +86,6 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   const TransactionItem = ({ transaction, index }: { transaction: Transaction; index: number }) => {
     const content = (
       <>
-        {/* Left side: Icon and Description/Date */}
         <View className="flex-row items-center flex-1">
           {getTransactionIcon(transaction.category.type)}
           <View className="ml-4 flex-1">
@@ -101,7 +98,6 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
           </View>
         </View>
 
-        {/* Right side: Amount */}
         <View className="items-end">
           <Text className={`text-lg font-geist-bold ${getAmountColor(transaction.category.type)}`}>
             {getAmountPrefix(transaction.category.type)}{formatCurrency(transaction.amount)}
@@ -141,7 +137,6 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
   return (
     <>
       <View className="bg-white px-5">
-        {/* Header - Solo mostrar si showTitle es true */}
         {showTitle && (
           <View 
             className="flex-row justify-between items-center"
@@ -160,7 +155,6 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
           </View>
         )}
 
-        {/* Transactions List */}
         <View>
           {displayTransactions.length === 0 ? (
             <EmptyState type={emptyStateType} isFiltered={isFiltered} />
@@ -176,7 +170,6 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
         </View>
       </View>
 
-      {/* Transaction Details Modal - Solo mostrar si es clickeable */}
       {clickable && (
         <TransactionDetailsModal
           visible={modalVisible}

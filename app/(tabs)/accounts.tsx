@@ -8,7 +8,6 @@ import { useTransactions } from '../../core/hooks/useTransactions';
 export default function AccountsScreen() {
   const { accounts, isLoading, error } = useTransactions();
 
-  // Calcular balance total
   const totalBalance = accounts.reduce((sum, account) => sum + account.currentBalance, 0);
 
   if (isLoading) {
@@ -93,7 +92,7 @@ const styles = StyleSheet.create({
   },
   accountsContainer: {
     marginTop: 30,
-    marginBottom: 120, // Aumentado de 100 a 120
-    paddingBottom: 20, // Padding adicional
+    marginBottom: 120, 
+    paddingBottom: 20,
   },
 });

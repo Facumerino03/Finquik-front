@@ -3,7 +3,6 @@ export interface TransactionsSummary {
   totalExpenses: number;
 }
 
-// Estructura real de la transacción según el backend
 export interface Transaction {
   id: number;
   amount: number;
@@ -27,13 +26,12 @@ export interface Transaction {
   };
 }
 
-// Interfaces para categorías y cuentas
 export interface Category {
   id: number;
   name: string;
   type: 'INCOME' | 'EXPENSE';
   iconName?: string | null;
-  iconColor?: string | null; // Agregar esta línea
+  iconColor?: string | null; 
 }
 
 export interface Account {
@@ -48,38 +46,34 @@ export interface Account {
   iconColor?: string;
 }
 
-// Payload para crear transacción
 export interface CreateTransactionPayload {
   amount: number;
   description: string;
-  transactionDate: string; // formato YYYY-MM-DD
+  transactionDate: string; 
   accountId: number;
   categoryId: number;
   iconName?: string;
 }
 
-// Payload para crear cuenta
 export interface CreateAccountPayload {
   name: string;
   type: string;
-  initialBalance: number; // Cambiado de currentBalance a initialBalance
+  initialBalance: number; 
   currency: string;
   iconName?: string;
   iconColor?: string;
 }
 
-// Payload para actualizar cuenta
 export interface UpdateAccountPayload {
   name: string;
   type: string;
-  initialBalance: number; // Agregado initialBalance
-  currentBalance: number; // Mantenemos currentBalance también
+  initialBalance: number; 
+  currentBalance: number; 
   currency: string;
   iconName?: string;
   iconColor?: string;
 }
 
-// Respuesta paginada del backend
 export interface PaginatedResponse<T> {
   content: T[];
   pageable: {
@@ -117,6 +111,6 @@ export interface TransactionsListProps {
   emptyStateType?: 'all' | 'incomes' | 'expenses';
   showTitle?: boolean;
   isFiltered?: boolean;
-  clickable?: boolean; // Nuevo prop para hacer las transacciones clickeables
-  onTransactionPress?: (transaction: Transaction) => void; // Nuevo prop para manejar el click
+  clickable?: boolean;
+  onTransactionPress?: (transaction: Transaction) => void;
 }

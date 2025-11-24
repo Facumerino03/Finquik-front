@@ -9,8 +9,6 @@ export default function Header() {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const handleProfilePress = () => {
-    // Navegar a perfil
-    //router.push('/profile');
   };
 
   const handleSettingsPress = () => {

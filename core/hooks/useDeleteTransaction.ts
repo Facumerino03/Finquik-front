@@ -12,7 +12,6 @@ export function useDeleteTransaction() {
       setIsLoading(true);
       setError(null);
       await deleteTransaction(transactionId);
-      // Refrescar todos los datos después de eliminar
       await refresh();
     } catch (err) {
       setError('Failed to delete transaction');

@@ -1,5 +1,5 @@
 export const AVAILABLE_ICONS = [
-  // Trabajo e Ingresos
+  // Work and Finance
   'Briefcase',
   'DollarSign',
   'TrendingUp',
@@ -13,26 +13,26 @@ export const AVAILABLE_ICONS = [
   'Coins',
   'BadgeDollarSign',
   
-  // Gastos y Compras
+  // Expenses and Shopping
   'ShoppingCart',
   'ShoppingBag',
   'Store',
   'Tag',
   'Receipt',
   
-  // Comida y Bebida
+  // Food and Drink
   'Coffee',
   'Utensils',
   'Pizza',
   'Wine',
   
-  // Hogar
+  // Home
   'Home',
   'Lamp',
   'Armchair',
   'BedDouble',
   
-  // Transporte
+  // Transportation
   'Car',
   'Bus',
   'Plane',
@@ -40,7 +40,7 @@ export const AVAILABLE_ICONS = [
   'Bike',
   'Fuel',
   
-  // Tecnología
+  // Tecnology
   'Smartphone',
   'Laptop',
   'Tv',
@@ -48,31 +48,31 @@ export const AVAILABLE_ICONS = [
   'Gamepad',
   'Headphones',
   
-  // Entretenimiento
+  // Entertainment
   'Film',
   'Music',
   'Book',
   'Camera',
   'Palette',
   
-  // Salud y Belleza
+  // Health and Beauty
   'Heart',
   'Activity',
   'Scissors',
   'Sparkles',
   
-  // Servicios
+  // Services
   'Zap',
   'Phone',
   'Globe',
   'Mail',
   
-  // Educación
+  // Education
   'GraduationCap',
   'BookOpen',
   'Pencil',
   
-  // Otros
+  // Others
   'Package',
   'Box',
   'Archive',

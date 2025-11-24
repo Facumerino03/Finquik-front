@@ -119,7 +119,6 @@ const TransactionDetailsModal: React.FC<TransactionDetailsModalProps> = ({
 
   const handleEdit = () => {
     if (transaction) {
-      // Navegar a la pantalla de edición con el ID de la transacción
       router.push({
         pathname: '/edit-transaction',
         params: { transactionId: transaction.id.toString() }

@@ -47,13 +47,11 @@ export default function FilterModal({
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   
-  // Estados para los date pickers
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [startDateValue, setStartDateValue] = useState(new Date());
   const [endDateValue, setEndDateValue] = useState(new Date());
 
-  // Sincronizar el estado interno con los filtros actuales cuando se abre el modal
   useEffect(() => {
     if (visible) {
       setSelectedType(currentFilters.type || null);
@@ -61,8 +59,7 @@ export default function FilterModal({
       setEndDate(currentFilters.endDate || '');
       setSelectedAccountId(currentFilters.accountId || null);
       setSelectedCategoryId(currentFilters.categoryId || null);
-      
-      // Convertir strings de fecha a Date objects si existen
+
       if (currentFilters.startDate) {
         setStartDateValue(new Date(currentFilters.startDate));
       }
@@ -73,7 +70,7 @@ export default function FilterModal({
   }, [visible, currentFilters]);
 
   const formatDateToString = (date: Date): string => {
-    return date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    return date.toISOString().split('T')[0];
   };
 
   const formatDateForDisplay = (dateString: string): string => {

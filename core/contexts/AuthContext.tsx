@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         token = await SecureStore.getItemAsync("userToken");
       } catch (e) {
-        console.error("Error al restaurar el token:", e);
+        console.error("Error restoring token:", e);
       }
       setUserToken(token);
       setIsLoading(false);

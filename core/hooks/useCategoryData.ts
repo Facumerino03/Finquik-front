@@ -39,7 +39,6 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
     fetchCategories();
   }, [userToken, type]);
 
-  // Calcular montos por categoría cuando cambien las transacciones o categorías
   useEffect(() => {
     if (categories.length === 0) {
       setCategoryData([]);
@@ -61,18 +60,14 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
         amount: totalAmount,
         transactionCount: categoryTransactions.length
       };
-    }); // Removido el .filter(item => item.amount > 0)
+    });
 
-    // Ordenar: primero las que tienen transacciones (por monto descendente), luego las vacías
     data.sort((a, b) => {
-      // Si ambas tienen transacciones, ordenar por monto
       if (a.amount > 0 && b.amount > 0) {
         return b.amount - a.amount;
       }
-      // Las que tienen transacciones van primero
       if (a.amount > 0) return -1;
       if (b.amount > 0) return 1;
-      // Si ambas están vacías, ordenar alfabéticamente
       return a.category.name.localeCompare(b.category.name);
     });
 
@@ -83,6 +78,6 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
     categoryData, 
     isLoading, 
     error,
-    refetch: fetchCategories // Exportar la función de refetch
+    refetch: fetchCategories
   };
 }

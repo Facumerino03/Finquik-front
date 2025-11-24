@@ -3,18 +3,17 @@ import api from './api';
 
 export interface TransactionFilters {
   type?: 'INCOME' | 'EXPENSE';
-  startDate?: string; // formato YYYY-MM-DD
-  endDate?: string; // formato YYYY-MM-DD
+  startDate?: string; 
+  endDate?: string; 
   accountId?: number;
   categoryId?: number;
-  description?: string; // Nuevo parámetro para búsqueda por descripción
+  description?: string;
 }
 
-// Payload para editar transacción
 export interface UpdateTransactionPayload {
   amount: number;
   description: string;
-  transactionDate: string; // formato YYYY-MM-DD
+  transactionDate: string; 
   accountId: number;
   categoryId: number;
   iconName?: string;
@@ -38,7 +37,6 @@ export async function deleteTransaction(transactionId: number): Promise<void> {
   await api.delete(`/api/transactions/${transactionId}`);
 }
 
-// Función genérica para obtener transacciones con filtros
 export async function getTransactionsWithFilters(filters: TransactionFilters = {}): Promise<Transaction[]> {
   const params = new URLSearchParams();
   
@@ -56,20 +54,19 @@ export async function getTransactionsWithFilters(filters: TransactionFilters = {
   return data.content;
 }
 
-// Nuevos endpoints para obtener transacciones - ahora manejan la respuesta paginada
 export async function getAllTransactions(): Promise<Transaction[]> {
   const { data } = await api.get<PaginatedResponse<Transaction>>('/api/transactions');
-  return data.content; // Extraer solo el array de transacciones
+  return data.content;
 }
 
 export async function getIncomeTransactions(): Promise<Transaction[]> {
   const { data } = await api.get<PaginatedResponse<Transaction>>('/api/transactions?type=INCOME');
-  return data.content; // Extraer solo el array de transacciones
+  return data.content;
 }
 
 export async function getExpenseTransactions(): Promise<Transaction[]> {
   const { data } = await api.get<PaginatedResponse<Transaction>>('/api/transactions?type=EXPENSE');
-  return data.content; // Extraer solo el array de transacciones
+  return data.content;
 }
 
 export async function getTransactionById(transactionId: number): Promise<Transaction> {

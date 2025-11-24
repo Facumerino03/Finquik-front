@@ -99,7 +99,6 @@ export default function CreateCategoryModal({
               className="flex-1 px-6"
               showsVerticalScrollIndicator={false}
             >
-              {/* Icon Display - Grande y centrado */}
               <View className="items-center mb-8">
                 <TouchableOpacity
                   onPress={() => setShowIconPicker(true)}
@@ -124,7 +123,6 @@ export default function CreateCategoryModal({
                 </Text>
               </View>
 
-              {/* Category Name */}
               <View className="mb-8">
                 <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Category name
@@ -140,7 +138,6 @@ export default function CreateCategoryModal({
                 />
               </View>
 
-              {/* Category Type (Read Only) */}
               <View className="mb-8">
                 <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
                   Category type

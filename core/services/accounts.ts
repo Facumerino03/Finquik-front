@@ -1,7 +1,6 @@
 import { Account, CreateAccountPayload, UpdateAccountPayload } from '../types/transactions';
 import api from './api';
 
-// Obtener todas las cuentas del usuario
 export async function getAllAccounts(): Promise<Account[]> {
   try {
     const { data } = await api.get<Account[]>('/api/accounts');
@@ -12,7 +11,6 @@ export async function getAllAccounts(): Promise<Account[]> {
   }
 }
 
-// Obtener una cuenta por ID
 export async function getAccountById(accountId: number): Promise<Account> {
   try {
     const { data } = await api.get<Account>(`/api/accounts/${accountId}`);
@@ -23,7 +21,6 @@ export async function getAccountById(accountId: number): Promise<Account> {
   }
 }
 
-// Crear una nueva cuenta
 export async function createAccount(accountData: CreateAccountPayload): Promise<Account> {
   try {
     console.log('Creating account with data:', accountData);
@@ -38,7 +35,6 @@ export async function createAccount(accountData: CreateAccountPayload): Promise<
   }
 }
 
-// Actualizar una cuenta existente
 export async function updateAccount(
   accountId: number, 
   accountData: UpdateAccountPayload
@@ -56,7 +52,6 @@ export async function updateAccount(
   }
 }
 
-// Eliminar una cuenta
 export async function deleteAccount(accountId: number): Promise<void> {
   try {
     console.log('Deleting account:', accountId);

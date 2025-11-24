@@ -71,7 +71,6 @@ export default function ResetPasswordScreen() {
     }
   };
 
-  // Pantalla de éxito
   if (showSuccess) {
     return (
       <View className="flex-1 bg-white px-6 justify-center items-center">
@@ -133,7 +132,6 @@ export default function ResetPasswordScreen() {
           />
         </View>
 
-        {/* Mostrar error si existe */}
         {error && (
           <View className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
             <Text className="text-red-600 text-sm font-geist">{error}</Text>

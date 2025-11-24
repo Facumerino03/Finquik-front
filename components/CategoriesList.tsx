@@ -21,7 +21,7 @@ interface CategoriesListProps {
   totalAmount: number;
   type: 'INCOME' | 'EXPENSE';
   showTitle?: boolean;
-  onRefresh?: () => void; // Nuevo prop
+  onRefresh?: () => void;
 }
 
 const CategoriesList: React.FC<CategoriesListProps> = ({
@@ -29,7 +29,7 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
   totalAmount,
   type,
   showTitle = true,
-  onRefresh, // Nuevo prop
+  onRefresh,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -55,7 +55,6 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
   };
 
   const handleCategoryUpdated = () => {
-    // Llamar al callback para refrescar los datos
     if (onRefresh) {
       onRefresh();
     }
@@ -70,7 +69,6 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
         style={{ marginBottom: index === categories.length - 1 ? 0 : 15 }}
         activeOpacity={0.7}
       >
-        {/* Left side: Icon and Category Name/Transaction Count */}
         <View className="flex-row items-center flex-1">
           <CategoryIcon
             iconName={categoryData.category.iconName}
@@ -88,7 +86,6 @@ const CategoriesList: React.FC<CategoriesListProps> = ({
           </View>
         </View>
 
-        {/* Right side: Amount and Percentage */}
         <View className="items-end">
           <Text className="text-lg font-geist-bold text-zinc-950">
             {formatCurrency(categoryData.amount)}
