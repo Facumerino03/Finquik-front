@@ -1,9 +1,9 @@
 import { ArrowBigDown, ArrowBigUp } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { Transaction, TransactionsListProps } from '../core/types/transactions';
-import EmptyState from './EmptyState';
-import TransactionDetailsModal from './TransactionDetailsModal';
+import { Transaction, TransactionsListProps } from '../../core/types/transactions';
+import EmptyState from '../common/EmptyState';
+import TransactionDetailsModal from '../modal/TransactionDetailsModal';
 
 const TransactionsList: React.FC<TransactionsListProps> = ({
   transactions,

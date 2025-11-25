@@ -2,8 +2,8 @@ import * as LucideIcons from 'lucide-react-native';
 import { X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { AVAILABLE_COLORS } from '../core/constants/availableColors';
-import { AVAILABLE_ICONS } from '../core/constants/availableIcons';
+import { AVAILABLE_COLORS } from '../../core/constants/availableColors';
+import { AVAILABLE_ICONS } from '../../core/constants/availableIcons';
 
 interface IconPickerProps {
   visible: boolean;

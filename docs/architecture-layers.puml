@@ -1,0 +1,87 @@
+@startuml Finquik Architecture Layers
+
+title Finquik Frontend - Architecture Layers
+
+package "UI Layer" {
+  [Screens\napp/(tabs)/\napp/(auth)/] as screens
+  [Components\ncomponents/*] as components
+}
+
+package "Business Logic Layer" {
+  [Custom Hooks\ncore/hooks/*] as hooks
+}
+
+package "State Management" {
+  [React Context\ncore/contexts/*] as context
+}
+
+package "API Layer" {
+  [Services\ncore/services/*] as services
+  [API Client\napi.ts] as apiClient
+}
+
+package "Type System" {
+  [TypeScript Types\ncore/types/*] as types
+}
+
+package "Backend" {
+  [Spring Boot API\nPort 8080] as backend
+}
+
+package "Storage" {
+  [Secure Storage\nexpo-secure-store] as storage
+}
+
+screens -down-> hooks : use
+components -down-> hooks : use
+screens -down-> components : render
+screens -down-> context : subscribe
+
+hooks -down-> services : call
+hooks -down-> context : update
+
+services -down-> apiClient : HTTP calls
+services -up-> types : use
+
+context -up-> types : use
+hooks -up-> types : use
+screens -up-> types : use
+
+apiClient -right-> storage : get token
+apiClient -down-> backend : HTTP + JWT
+
+note right of context
+  Global State:
+  - TransactionsContext
+  - AuthContext
+
+  Pattern:
+  - Provider at root
+  - Consumers everywhere
+end note
+
+note right of hooks
+  Business Logic:
+  - useCreateTransaction
+  - useUpdateTransaction
+  - useAccounts
+  - useCategoryData
+
+  Pattern:
+  - API call wrapper
+  - Error handling
+  - Context refresh
+end note
+
+note right of services
+  Pure API functions:
+  - createTransaction()
+  - getTransactions()
+  - updateAccount()
+
+  Pattern:
+  - Returns Promise
+  - No side effects
+end note
+
+@enduml

@@ -1,10 +1,10 @@
 import { ChevronRight } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { Account } from '../core/types/transactions';
-import CategoryIcon from './CategoryIcon';
-import CreateAccountModal from './CreateAccountModal';
-import EditAccountModal from './EditAccountModal';
+import { Account } from '../../core/types/transactions';
+import CategoryIcon from '../categories/CategoryIcon';
+import CreateAccountModal from '../modal/CreateAccountModal';
+import EditAccountModal from '../modal/EditAccountModal';
 
 interface AccountsListProps {
   accounts: Account[];

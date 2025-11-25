@@ -1,7 +1,7 @@
 import * as LucideIcons from 'lucide-react-native';
 import React from 'react';
 import { View } from 'react-native';
-import { AVAILABLE_COLORS } from '../core/constants/availableColors';
+import { AVAILABLE_COLORS } from '../../core/constants/availableColors';
 
 interface CategoryIconProps {
   iconName?: string | null;

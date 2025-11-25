@@ -15,10 +15,10 @@ import {
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AccountSelectorModal from '../../components/AccountSelectorModal';
-import CategoryIcon from '../../components/CategoryIcon';
-import CreateCategoryModal from '../../components/CreateCategoryModal';
-import DescriptionModal from '../../components/DescriptionModal';
+import CategoryIcon from '../../components/categories/CategoryIcon';
+import AccountSelectorModal from '../../components/modal/AccountSelectorModal';
+import CreateCategoryModal from '../../components/modal/CreateCategoryModal';
+import DescriptionModal from '../../components/modal/DescriptionModal';
 import { AVAILABLE_COLORS } from '../../core/constants/availableColors';
 import { useAuth } from '../../core/contexts/AuthContext';
 import { useAccounts } from '../../core/hooks/useAccounts';

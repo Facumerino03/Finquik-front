@@ -16,8 +16,8 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import AccountSelectorModal from '../components/AccountSelectorModal';
-import CategoryIcon from '../components/CategoryIcon';
+import CategoryIcon from '../components/categories/CategoryIcon';
+import AccountSelectorModal from '../components/modal/AccountSelectorModal';
 import { AVAILABLE_COLORS } from '../core/constants/availableColors';
 import { useAuth } from '../core/contexts/AuthContext';
 import { useAccounts } from '../core/hooks/useAccounts';

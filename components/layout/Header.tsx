@@ -2,7 +2,7 @@ import { Settings, UserRound } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { StatusBar, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import SettingsModal from './SettingsModal';
+import SettingsModal from '../modal/SettingsModal';
 
 export default function Header() {
   const insets = useSafeAreaInsets();

@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { LogOut, X } from 'lucide-react-native';
 import React from 'react';
 import { Alert, Modal, Text, TouchableOpacity, View } from 'react-native';
-import { useAuth } from '../core/contexts/AuthContext';
+import { useAuth } from '../../core/contexts/AuthContext';
 
 interface SettingsModalProps {
   visible: boolean;

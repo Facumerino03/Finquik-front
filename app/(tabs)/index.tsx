@@ -1,9 +1,9 @@
 import { router } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Chart from '../../components/Chart';
-import Header from '../../components/Header';
-import TransactionsList from '../../components/TransactionsList';
+import Chart from '../../components/charts/Chart';
+import Header from '../../components/layout/Header';
+import TransactionsList from '../../components/transactions/TransactionsList';
 import { useTransactions } from '../../core/hooks/useTransactions';
 import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary';
 

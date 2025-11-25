@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import CategoriesList from '../../components/CategoriesList';
-import CategoryChart from '../../components/CategoryChart';
-import CreateCategoryModal from '../../components/CreateCategoryModal';
-import Header from '../../components/Header';
-import TransactionsList from '../../components/TransactionsList';
+import CategoriesList from '../../components/categories/CategoriesList';
+import CategoryChart from '../../components/categories/CategoryChart';
+import Header from '../../components/layout/Header';
+import CreateCategoryModal from '../../components/modal/CreateCategoryModal';
+import TransactionsList from '../../components/transactions/TransactionsList';
 import { useCategoryData } from '../../core/hooks/useCategoryData';
 import { useTransactions } from '../../core/hooks/useTransactions';
 import { useTransactionsSummary } from '../../core/hooks/useTransactionsSummary';

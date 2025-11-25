@@ -1,8 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
-import AccountsBarChart from '../../components/AccountsBarChart';
-import AccountsList from '../../components/AccountsList';
-import Header from '../../components/Header';
+import AccountsBarChart from '../../components/accounts/AccountsBarChart';
+import AccountsList from '../../components/accounts/AccountsList';
+import Header from '../../components/layout/Header';
 import { useTransactions } from '../../core/hooks/useTransactions';
 
 export default function AccountsScreen() {

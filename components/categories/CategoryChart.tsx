@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import Svg, { G, Path } from 'react-native-svg';
-import { Category } from '../core/types/transactions';
+import { Category } from '../../core/types/transactions';
 
 interface CategoryData {
   category: Category;

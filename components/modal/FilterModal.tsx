@@ -2,7 +2,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Calendar, Check, ChevronDown, Minus, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Modal, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { Account, Category } from '../core/types/transactions';
+import { Account, Category } from '../../core/types/transactions';
 
 interface FilterModalProps {
   visible: boolean;

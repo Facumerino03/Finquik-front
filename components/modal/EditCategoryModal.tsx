@@ -1,10 +1,10 @@
 import { Trash2, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { deleteCategory, updateCategory } from '../core/services/categories';
-import { Category } from '../core/types/transactions';
-import CategoryIcon from './CategoryIcon';
-import IconPicker from './IconPicker';
+import { deleteCategory, updateCategory } from '../../core/services/categories';
+import { Category } from '../../core/types/transactions';
+import CategoryIcon from '../categories/CategoryIcon';
+import IconPicker from '../common/IconPicker';
 
 interface EditCategoryModalProps {
   visible: boolean;

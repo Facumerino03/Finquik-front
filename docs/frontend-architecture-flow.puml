@@ -1,0 +1,113 @@
+@startuml Frontend Architecture - Create Transaction Flow
+
+title Finquik Frontend - Typical API Call Flow\n(Example: Create Transaction)
+
+actor User as user
+participant "Screen\nadd.tsx" as screen
+participant "Hook\nuseCreateTransaction" as hook
+participant "Service\ntransactions.ts" as service
+participant "API Client\napi.ts" as api
+participant "Backend\nSpring Boot" as backend
+participant "Context\nTransactionsContext" as context
+participant "Components\n(subscribed)" as components
+
+autonumber
+
+== User Creates Transaction ==
+
+user -> screen: Click "Add Transaction"
+activate screen
+
+screen -> screen: Validate form data
+note right
+  - Check amount
+  - Check category
+  - Check account
+end note
+
+screen -> hook: createTransaction(payload)
+activate hook
+
+hook -> hook: Set isLoading = true
+
+hook -> service: createTransaction(transactionData)
+activate service
+
+service -> api: POST /api/transactions
+activate api
+note right
+  Request Interceptor:
+  - Add Bearer token
+  - Set headers
+end note
+
+api -> backend: HTTP POST with JWT
+activate backend
+
+backend -> backend: Process transaction
+backend -> backend: Save to database
+
+backend --> api: 201 Created
+deactivate backend
+
+api --> service: Response data
+deactivate api
+
+service --> hook: Transaction created
+deactivate service
+
+== Update Global State ==
+
+hook -> context: refresh()
+activate context
+note right
+  Context refetches:
+  - All transactions
+  - Accounts
+  - Summary data
+end note
+
+context -> service: getAllTransactions()
+activate service
+service -> api: GET /api/transactions
+activate api
+api -> backend: HTTP GET
+activate backend
+backend --> api: Transactions[]
+deactivate backend
+api --> service: data
+deactivate api
+service --> context: Transactions[]
+deactivate service
+
+context -> context: Update state
+context --> components: Notify subscribers
+activate components
+
+components -> components: Re-render with new data
+deactivate components
+
+deactivate context
+
+hook -> hook: Set isLoading = false
+hook --> screen: Success
+deactivate hook
+
+screen -> screen: Show success alert
+screen -> screen: Reset form
+screen --> user: Transaction added!
+deactivate screen
+
+== Components Auto-Update ==
+
+components -> user: Display updated data
+note left
+  All components subscribed
+  to TransactionsContext
+  automatically show new data:
+  - Home screen chart
+  - Transactions list
+  - Account balances
+end note
+
+@enduml

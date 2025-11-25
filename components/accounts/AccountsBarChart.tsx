@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { G, Path, Svg } from 'react-native-svg';
-import { Account } from '../core/types/transactions';
+import { Account } from '../../core/types/transactions';
 
 interface AccountsBarChartProps {
   accounts: Account[];

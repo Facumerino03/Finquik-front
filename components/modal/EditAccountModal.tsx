@@ -1,4 +1,4 @@
-import { Banknote, Building2, CreditCard, TrendingUp, Wallet, X } from 'lucide-react-native';
+import { Banknote, Building2, CreditCard, Trash2, TrendingUp, Wallet, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
@@ -11,13 +11,14 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useAccountsManager } from '../core/hooks/useAccountsManager';
-import { CreateAccountPayload } from '../core/types/transactions';
-import CategoryIcon from './CategoryIcon';
-import IconPicker from './IconPicker';
+import { useAccountsManager } from '../../core/hooks/useAccountsManager';
+import { Account, UpdateAccountPayload } from '../../core/types/transactions';
+import CategoryIcon from '../categories/CategoryIcon';
+import IconPicker from '../common/IconPicker';
 
-interface CreateAccountModalProps {
+interface EditAccountModalProps {
   visible: boolean;
+  account: Account;
   onClose: () => void;
 }
 
@@ -76,27 +77,19 @@ const getAccountTypeIcon = (iconName: string) => {
   }
 };
 
-export default function CreateAccountModal({ visible, onClose }: CreateAccountModalProps) {
-  const { createAccount, isCreating } = useAccountsManager();
+export default function EditAccountModal({ visible, account, onClose }: EditAccountModalProps) {
+  const { updateAccount, deleteAccount, isUpdating, isDeleting } = useAccountsManager();
 
-  const [name, setName] = useState('');
-  const [selectedType, setSelectedType] = useState('BANK_ACCOUNT');
-  const [balance, setBalance] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [name, setName] = useState(account.name);
+  const [selectedType, setSelectedType] = useState(account.type);
+  const [selectedIcon, setSelectedIcon] = useState<string | null>(account.iconName || null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(account.iconColor || null);
   const [showIconPicker, setShowIconPicker] = useState(false);
 
-  const resetForm = () => {
-    setName('');
-    setSelectedType('BANK_ACCOUNT');
-    setBalance('');
-    setSelectedIcon(null);
-    setSelectedColor(null);
-  };
+  const isLoading = isUpdating || isDeleting;
 
   const handleClose = () => {
-    if (!isCreating) {
-      resetForm();
+    if (!isLoading) {
       onClose();
     }
   };
@@ -106,34 +99,63 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
     setSelectedColor(color);
   };
 
-  const handleCreate = async () => {
+  const handleUpdate = async () => {
     if (!name.trim()) {
       Alert.alert('Error', 'Please enter an account name');
       return;
     }
 
-    if (!balance.trim() || isNaN(parseFloat(balance))) {
-      Alert.alert('Error', 'Please enter a valid balance');
-      return;
-    }
-
-    const accountData: CreateAccountPayload = {
+    const accountData: UpdateAccountPayload = {
       name: name.trim(),
       type: selectedType,
-      initialBalance: parseFloat(balance),
-      currency: 'USD',
+      initialBalance: account.currentBalance,
+      currentBalance: account.currentBalance,
+      currency: account.currency,
       iconName: selectedIcon || undefined,
       iconColor: selectedColor || undefined,
     };
 
     try {
-      await createAccount(accountData);
-      Alert.alert('Success', 'Account created successfully');
-      resetForm();
+      await updateAccount(account.id, accountData);
+      Alert.alert('Success', 'Account updated successfully');
       onClose();
     } catch (error) {
-      Alert.alert('Error', 'Failed to create account. Please try again.');
+      Alert.alert('Error', 'Failed to update account. Please try again.');
     }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Account',
+      `Are you sure you want to delete "${account.name}"? This will also delete all associated transactions.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAccount(account.id);
+              Alert.alert('Success', 'Account deleted successfully');
+              onClose();
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete account. Please try again.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: account.currency,
+      minimumFractionDigits: 2,
+    }).format(amount);
   };
 
   return (
@@ -149,13 +171,13 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
             {/* Header */}
             <View className="flex-row items-center justify-between px-6 pt-10 pb-8">
               <Text className="text-2xl font-geist-semibold text-zinc-950">
-                Create account
+                Edit account
               </Text>
               <TouchableOpacity
                 onPress={handleClose}
                 className="w-8 h-8 items-center justify-center"
                 activeOpacity={0.7}
-                disabled={isCreating}
+                disabled={isLoading}
               >
                 <X size={24} color="#09090b" />
               </TouchableOpacity>
@@ -171,7 +193,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
                 <TouchableOpacity
                   onPress={() => setShowIconPicker(true)}
                   activeOpacity={0.7}
-                  disabled={isCreating}
+                  disabled={isLoading}
                 >
                   {selectedIcon && selectedColor ? (
                     <CategoryIcon
@@ -202,7 +224,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
                   placeholder="Enter account name"
                   placeholderTextColor="#a1a1aa"
                   className="bg-white border border-zinc-200 rounded-lg px-4 py-4 text-base font-geist text-zinc-950"
-                  editable={!isCreating}
+                  editable={!isLoading}
                 />
               </View>
 
@@ -230,7 +252,7 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
                           paddingVertical: 4,
                         }}
                         activeOpacity={0.7}
-                        disabled={isCreating}
+                        disabled={isLoading}
                       >
                         <View
                           className="w-9 h-9 rounded-full items-center justify-center"
@@ -253,30 +275,18 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
                 </View>
               </View>
 
-              {/* Initial Balance */}
+              {/* Current Balance (Read Only) */}
               <View className="mb-8">
                 <Text className="text-sm font-geist-medium text-zinc-950 mb-2">
-                  Initial balance
+                  Current balance
                 </Text>
-                <View className="bg-white border border-zinc-200 rounded-lg px-4 py-4 flex-row items-center">
+                <View className="bg-zinc-50 border border-zinc-200 rounded-lg px-4 py-4 flex-row items-center">
                   <Text className="text-base font-geist-medium text-zinc-500 mr-2">$</Text>
-                  <TextInput
-                    value={balance}
-                    onChangeText={setBalance}
-                    placeholder="0.00"
-                    placeholderTextColor="#a1a1aa"
-                    keyboardType="decimal-pad"
-                    className="flex-1 text-base font-geist-medium text-zinc-950"
-                    style={{ 
-                      paddingVertical: 0,
-                      paddingHorizontal: 0,
-                      includeFontPadding: false,
-                      textAlignVertical: 'center',
-                    }}
-                    editable={!isCreating}
-                  />
+                  <Text className="flex-1 text-base font-geist-medium text-zinc-950">
+                    {formatCurrency(account.currentBalance).replace('$', '')}
+                  </Text>
                   <Image
-                    source={require('../shared/assets/icons/us.png')}
+                    source={require('../../shared/assets/icons/us.png')}
                     style={{ width: 24, height: 24, marginLeft: 8 }}
                     resizeMode="contain"
                   />
@@ -284,28 +294,45 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
               </View>
             </ScrollView>
 
-            {/* Create Button */}
-            <View className="px-6 pb-8 pt-4">
+            {/* Save and Delete Buttons */}
+            <View className="px-6 pb-8 pt-4 flex-row gap-3">
+              {/* Delete Button */}
               <TouchableOpacity
-                onPress={handleCreate}
-                disabled={isCreating || !name.trim() || !balance.trim()}
-                className={`py-4 rounded-lg ${
-                  isCreating || !name.trim() || !balance.trim()
+                onPress={handleDelete}
+                disabled={isLoading}
+                className={`w-14 h-14 rounded-full items-center justify-center ${
+                  isLoading ? 'bg-red-200' : 'bg-red-500'
+                }`}
+                activeOpacity={0.7}
+              >
+                {isDeleting ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <Trash2 size={22} color="#FFFFFF" strokeWidth={2} />
+                )}
+              </TouchableOpacity>
+
+              {/* Save Button */}
+              <TouchableOpacity
+                onPress={handleUpdate}
+                disabled={isLoading || !name.trim()}
+                className={`flex-1 py-4 rounded-lg ${
+                  isLoading || !name.trim()
                     ? 'bg-zinc-300'
                     : 'bg-zinc-950'
                 }`}
                 activeOpacity={0.7}
               >
-                {isCreating ? (
+                {isUpdating ? (
                   <View className="flex-row items-center justify-center">
                     <ActivityIndicator size="small" color="#FFFFFF" />
                     <Text className="ml-2 text-lg font-geist-semibold text-white">
-                      Creating...
+                      Saving...
                     </Text>
                   </View>
                 ) : (
                   <Text className="text-lg font-geist-semibold text-white text-center">
-                    Create Account
+                    Save changes
                   </Text>
                 )}
               </TouchableOpacity>

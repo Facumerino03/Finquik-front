@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { Category } from '../core/types/transactions';
-import CategoryIcon from './CategoryIcon';
-import EditCategoryModal from './EditCategoryModal';
+import { Category } from '../../core/types/transactions';
+import CategoryIcon from '../categories/CategoryIcon';
+import EditCategoryModal from '../modal/EditCategoryModal';
 
 interface CategoryData {
   category: {

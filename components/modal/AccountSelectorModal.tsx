@@ -1,8 +1,8 @@
 import { Check, Plus, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { Account } from '../core/types/transactions';
-import CategoryIcon from './CategoryIcon';
+import { Account } from '../../core/types/transactions';
+import CategoryIcon from '../categories/CategoryIcon';
 import CreateAccountModal from './CreateAccountModal';
 
 interface AccountSelectorModalProps {

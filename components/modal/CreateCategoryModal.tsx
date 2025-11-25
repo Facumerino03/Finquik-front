@@ -1,9 +1,9 @@
 import { X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { createCategory } from '../core/services/categories';
-import CategoryIcon from './CategoryIcon';
-import IconPicker from './IconPicker';
+import { createCategory } from '../../core/services/categories';
+import CategoryIcon from '../categories/CategoryIcon';
+import IconPicker from '../common/IconPicker';
 
 interface CreateCategoryModalProps {
   visible: boolean;

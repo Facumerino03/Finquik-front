@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { ArrowBigDown, ArrowBigUp, Edit, Trash2, X } from 'lucide-react-native';
+import { ArrowBigDown, ArrowBigUp, Trash2, X } from 'lucide-react-native';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useDeleteTransaction } from '../core/hooks/useDeleteTransaction';
-import { Transaction } from '../core/types/transactions';
+import { useDeleteTransaction } from '../../core/hooks/useDeleteTransaction';
+import { Transaction } from '../../core/types/transactions';
 
 interface TransactionDetailsModalProps {
   visible: boolean;
