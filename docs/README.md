@@ -15,6 +15,7 @@ This folder contains PlantUML diagrams that document the frontend architecture o
    - Component diagram showing the architecture layers
    - Overview of how different parts connect
    - Includes notes on patterns used
+   - Optional: png format of this diagram
 
 ### How to View
 
