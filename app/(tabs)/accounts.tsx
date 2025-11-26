@@ -1,4 +1,5 @@
-import React from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import AccountsBarChart from '../../components/accounts/AccountsBarChart';
 import AccountsList from '../../components/accounts/AccountsList';
@@ -6,11 +7,21 @@ import Header from '../../components/layout/Header';
 import { useTransactions } from '../../core/hooks/useTransactions';
 
 export default function AccountsScreen() {
-  const { accounts, isLoading, error } = useTransactions();
+  const { accounts, isLoading, error, refresh } = useTransactions();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const totalBalance = accounts.reduce((sum, account) => sum + account.currentBalance, 0);
 
-  if (isLoading) {
+  useFocusEffect(
+    useCallback(() => {
+      if (accounts.length > 0) {
+        setIsRefreshing(true);
+        refresh().finally(() => setIsRefreshing(false));
+      }
+    }, [accounts.length])
+  );
+
+  if (isLoading && accounts.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <Header />
@@ -42,9 +53,10 @@ export default function AccountsScreen() {
         
         {/* Accounts List */}
         <View style={styles.accountsContainer}>
-          <AccountsList
-            accounts={accounts}
+          <AccountsList 
+            accounts={accounts} 
             totalBalance={totalBalance}
+            onRefresh={refresh}
           />
         </View>
       </ScrollView>

@@ -9,9 +9,10 @@ import EditAccountModal from '../modal/EditAccountModal';
 interface AccountsListProps {
   accounts: Account[];
   totalBalance: number;
+  onRefresh?: () => void;
 }
 
-export default function AccountsList({ accounts, totalBalance }: AccountsListProps) {
+export default function AccountsList({ accounts, totalBalance, onRefresh }: AccountsListProps) {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -80,6 +81,18 @@ export default function AccountsList({ accounts, totalBalance }: AccountsListPro
     </TouchableOpacity>
   );
 
+  const handleAccountUpdated = () => {
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+
+  const handleAccountCreated = () => {
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
+
   return (
     <View className="bg-white px-5">
       {/* Header */}
@@ -125,6 +138,7 @@ export default function AccountsList({ accounts, totalBalance }: AccountsListPro
           onClose={() => {
             setShowEditModal(false);
             setSelectedAccount(null);
+            handleAccountUpdated(); 
           }}
         />
       )}
@@ -133,6 +147,7 @@ export default function AccountsList({ accounts, totalBalance }: AccountsListPro
       <CreateAccountModal
         visible={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+        onAccountCreated={handleAccountCreated} 
       />
     </View>
   );

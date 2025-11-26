@@ -19,6 +19,7 @@ import IconPicker from '../common/IconPicker';
 interface CreateAccountModalProps {
   visible: boolean;
   onClose: () => void;
+  onAccountCreated?: () => void;
 }
 
 const ACCOUNT_TYPES = [
@@ -76,7 +77,7 @@ const getAccountTypeIcon = (iconName: string) => {
   }
 };
 
-export default function CreateAccountModal({ visible, onClose }: CreateAccountModalProps) {
+export default function CreateAccountModal({ visible, onClose, onAccountCreated }: CreateAccountModalProps) {
   const { createAccount, isCreating } = useAccountsManager();
 
   const [name, setName] = useState('');
@@ -130,6 +131,11 @@ export default function CreateAccountModal({ visible, onClose }: CreateAccountMo
       await createAccount(accountData);
       Alert.alert('Success', 'Account created successfully');
       resetForm();
+      
+      if (onAccountCreated) {
+        onAccountCreated();
+      }
+      
       onClose();
     } catch (error) {
       Alert.alert('Error', 'Failed to create account. Please try again.');

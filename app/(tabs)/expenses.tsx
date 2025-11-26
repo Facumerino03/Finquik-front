@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CategoriesList from '../../components/categories/CategoriesList';
 import CategoryChart from '../../components/categories/CategoryChart';
@@ -15,6 +15,7 @@ export default function ExpensesScreen() {
   const { categoryData, isLoading: categoriesLoading, error: categoriesError, refetch: refetchCategories } = useCategoryData('EXPENSE', expenseTransactions);
   const { totalExpenses } = useTransactionsSummary();
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleSeeAllPress = () => {
     router.push('/all-transactions');
@@ -24,10 +25,19 @@ export default function ExpensesScreen() {
     refetchCategories();
   };
 
-  const isLoading = transactionsLoading || categoriesLoading;
-  const error = transactionsError || categoriesError;
+  useFocusEffect(
+    useCallback(() => {
+      if (categoryData.length > 0 || expenseTransactions.length > 0) {
+        setIsRefreshing(true);
+        refetchCategories();
+        setIsRefreshing(false);
+      }
+    }, [categoryData.length, expenseTransactions.length])
+  );
 
-  if (isLoading) {
+  const isLoading = transactionsLoading || categoriesLoading;
+
+  if (isLoading && categoryData.length === 0 && expenseTransactions.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         <Header />
@@ -38,6 +48,8 @@ export default function ExpensesScreen() {
       </SafeAreaView>
     );
   }
+
+  const error = transactionsError || categoriesError;
 
   return (
     <>

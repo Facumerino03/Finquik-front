@@ -11,6 +11,7 @@ interface AccountSelectorModalProps {
   accounts: Account[];
   selectedAccountId: number | null;
   onSelectAccount: (accountId: number) => void;
+  onAccountCreated?: () => void;
 }
 
 export default function AccountSelectorModal({
@@ -19,6 +20,7 @@ export default function AccountSelectorModal({
   accounts,
   selectedAccountId,
   onSelectAccount,
+  onAccountCreated,
 }: AccountSelectorModalProps) {
   const [showCreateAccountModal, setShowCreateAccountModal] = useState(false);
   
@@ -32,8 +34,14 @@ export default function AccountSelectorModal({
   };
 
   const handleCreateAccount = () => {
-    onClose();
     setShowCreateAccountModal(true);
+  };
+
+  const handleAccountCreated = () => {
+    setShowCreateAccountModal(false);
+    if (onAccountCreated) {
+      onAccountCreated();
+    }
   };
 
   return (
@@ -135,6 +143,7 @@ export default function AccountSelectorModal({
       <CreateAccountModal
         visible={showCreateAccountModal}
         onClose={() => setShowCreateAccountModal(false)}
+        onAccountCreated={handleAccountCreated}
       />
     </>
   );

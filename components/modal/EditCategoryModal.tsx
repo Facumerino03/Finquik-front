@@ -81,7 +81,7 @@ export default function EditCategoryModal({
 
     Alert.alert(
       'Delete Category',
-      `Are you sure you want to delete "${category.name}"? This will affect all associated transactions.`,
+      `Are you sure you want to delete "${category.name}"?`,
       [
         {
           text: 'Cancel',
@@ -97,8 +97,21 @@ export default function EditCategoryModal({
               Alert.alert('Success', 'Category deleted successfully');
               onCategoryUpdated();
               onClose();
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete category. Please try again.');
+            } catch (error: any) {
+              const errorMessage = error?.response?.data?.message || error?.message || '';
+              const isForeignKeyError = errorMessage.includes('foreign key constraint') || 
+                                       errorMessage.includes('referenced from table') ||
+                                       errorMessage.includes('SQLState: 23503');
+
+              if (isForeignKeyError) {
+                Alert.alert(
+                  'Cannot Delete Category',
+                  `This category has associated transactions. Please delete or reassign those transactions first before deleting this category.`,
+                  [{ text: 'OK' }]
+                );
+              } else {
+                Alert.alert('Error', 'Failed to delete category. Please try again.');
+              }
             } finally {
               setIsDeleting(false);
             }

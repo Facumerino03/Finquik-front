@@ -14,6 +14,7 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
   const [categoryData, setCategoryData] = useState<CategoryData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { userToken } = useAuth();
 
   const fetchCategories = async () => {
@@ -37,7 +38,7 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
 
   useEffect(() => {
     fetchCategories();
-  }, [userToken, type]);
+  }, [userToken, type, refreshTrigger]);
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -74,10 +75,14 @@ export function useCategoryData(type: 'INCOME' | 'EXPENSE', transactions: Transa
     setCategoryData(data);
   }, [categories, transactions]);
 
+  const refetch = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   return { 
     categoryData, 
     isLoading, 
     error,
-    refetch: fetchCategories
+    refetch
   };
 }

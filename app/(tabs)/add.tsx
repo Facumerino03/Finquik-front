@@ -25,6 +25,7 @@ import { useAccounts } from '../../core/hooks/useAccounts';
 import { useCreateTransaction } from '../../core/hooks/useCreateTransaction';
 import { getCategoriesByType } from '../../core/services/categories';
 import { Category } from '../../core/types/transactions';
+import { useTransactions } from '../../core/hooks/useTransactions';
 
 export default function AddTransactionScreen() {
   const [amount, setAmount] = useState('');
@@ -39,9 +40,11 @@ export default function AddTransactionScreen() {
   const [description, setDescription] = useState('');
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
+  
   const { userToken, isLoading: authLoading } = useAuth();
   const { accounts, isLoading: accountsLoading, refresh: refreshAccounts } = useAccounts();
   const { createTransaction, isLoading: isCreating } = useCreateTransaction();
+  const { refresh: refreshTransactions } = useTransactions();
   const insets = useSafeAreaInsets();
 
   // Load categories based on selected type
@@ -114,7 +117,12 @@ export default function AddTransactionScreen() {
   };
 
   const handleCategoryCreated = () => {
-    loadCategories();
+    loadCategories(); 
+    refreshTransactions(); 
+  };
+
+  const handleAccountCreated = () => {
+    refreshAccounts(); 
   };
 
   const formatCurrency = (amount: number) => {
@@ -508,42 +516,41 @@ export default function AddTransactionScreen() {
             </TouchableOpacity>
           </View>
         </View>
-      </SafeAreaView>
 
-      {/* Create Category Modal */}
-      <CreateCategoryModal
-        visible={showCreateCategoryModal}
-        onClose={() => setShowCreateCategoryModal(false)}
-        categoryType={selectedType}
-        onCategoryCreated={handleCategoryCreated}
-      />
-
-      {/* Description Modal */}
-      <DescriptionModal
-        visible={showDescriptionModal}
-        onClose={() => setShowDescriptionModal(false)}
-        description={description}
-        onSave={setDescription}
-      />
-
-      {/* Account Selector Modal */}
-      <AccountSelectorModal
-        visible={showAccountModal}
-        onClose={() => setShowAccountModal(false)}
-        accounts={accounts}
-        selectedAccountId={selectedAccountId}
-        onSelectAccount={setSelectedAccountId}
-      />
-
-      {/* Date Picker */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={selectedDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleDateChange}
+        {/* Modals */}
+        <CreateCategoryModal
+          visible={showCreateCategoryModal}
+          onClose={() => setShowCreateCategoryModal(false)}
+          categoryType={selectedType}
+          onCategoryCreated={handleCategoryCreated}
         />
-      )}
+
+        <DescriptionModal
+          visible={showDescriptionModal}
+          onClose={() => setShowDescriptionModal(false)}
+          description={description}
+          onSave={setDescription}
+        />
+
+        <AccountSelectorModal
+          visible={showAccountModal}
+          onClose={() => setShowAccountModal(false)}
+          accounts={accounts}
+          selectedAccountId={selectedAccountId}
+          onSelectAccount={setSelectedAccountId}
+          onAccountCreated={handleAccountCreated}
+        />
+
+        {/* Date Picker */}
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleDateChange}
+          />
+        )}
+      </SafeAreaView>
     </View>
   );
 }
