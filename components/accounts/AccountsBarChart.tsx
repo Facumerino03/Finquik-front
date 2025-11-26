@@ -18,7 +18,9 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
 }) => {
   const [selectedAccount, setSelectedAccount] = useState<SelectedAccount>('none');
   
-  const totalBalance = accounts.reduce((sum, account) => sum + account.currentBalance, 0);
+  const totalBalance = accounts.reduce((sum, account) => {
+    return sum + Math.max(0, account.currentBalance);
+  }, 0);
   
   const gapWidth = 8;
   const borderRadius = 50;
@@ -30,14 +32,22 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
     const totalGaps = gapWidth * (accounts.length - 1);
     const availableWidth = width - totalGaps;
     
-    const proportionalWidths = accounts.map(account => 
-      (account.currentBalance / totalBalance) * availableWidth
+    const proportionalWidths = accounts.map(account => {
+      if (account.currentBalance <= 0) {
+        return minSegmentWidth;
+      }
+      return (account.currentBalance / totalBalance) * availableWidth;
+    });
+    
+    const negativeCount = accounts.filter(acc => acc.currentBalance <= 0).length;
+    const spaceUsedByNegative = negativeCount * minSegmentWidth;
+    
+    const isSmall = proportionalWidths.map((w, i) => 
+      accounts[i].currentBalance > 0 && w < minSegmentWidth
     );
+    const smallPositiveCount = isSmall.filter(Boolean).length;
     
-    const isSmall = proportionalWidths.map(w => w < minSegmentWidth);
-    const smallCount = isSmall.filter(Boolean).length;
-    
-    if (smallCount === 0) {
+    if (smallPositiveCount === 0 && negativeCount === 0) {
       let currentX = 0;
       return accounts.map((account, index) => {
         const segmentWidth = proportionalWidths[index];
@@ -56,15 +66,18 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
       });
     }
     
-    const spaceUsedBySmall = smallCount * minSegmentWidth;
+    const spaceUsedBySmall = (smallPositiveCount + negativeCount) * minSegmentWidth;
     const spaceForLarge = availableWidth - spaceUsedBySmall;
     
     const largeBalance = accounts.reduce((sum, account, i) => {
-      return isSmall[i] ? sum : sum + account.currentBalance;
+      if (account.currentBalance <= 0 || isSmall[i]) {
+        return sum;
+      }
+      return sum + account.currentBalance;
     }, 0);
     
     const finalWidths = accounts.map((account, i) => {
-      if (isSmall[i]) {
+      if (account.currentBalance <= 0 || isSmall[i]) {
         return minSegmentWidth;
       } else {
         return (account.currentBalance / largeBalance) * spaceForLarge;
@@ -109,19 +122,21 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
   };
   
   const getSegmentColor = (index: number) => {
+    const account = accounts[index];
+    
     if (selectedAccount === 'none') {
-      return accounts[index].iconColor || '#71717a';
+      return account.iconColor || '#71717a';
     }
     
     if (selectedAccount === index) {
-      return accounts[index].iconColor || '#71717a';
+      return account.iconColor || '#71717a';
     }
     
     return '#e4e4e7';
   };
   
   const getCenterContent = () => {
-    if (totalBalance === 0 || accounts.length === 0) {
+    if (accounts.length === 0) {
       return { value: 0, label: 'No accounts yet' };
     }
     
@@ -133,18 +148,22 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
       };
     }
     
-    return { value: totalBalance, label: 'Total balance' };
+    const realTotalBalance = accounts.reduce((sum, account) => sum + account.currentBalance, 0);
+    return { value: realTotalBalance, label: 'Total balance' };
   };
   
   const centerContent = getCenterContent();
   
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    const absAmount = Math.abs(amount);
+    const formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(Math.abs(amount));
+    }).format(absAmount);
+    
+    return amount < 0 ? `-${formatted}` : formatted;
   };
 
   const createRoundedRectPath = (x: number, y: number, width: number, height: number, radius: number, isFirst: boolean, isLast: boolean) => {
@@ -206,7 +225,10 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
     <TouchableWithoutFeedback onPress={handleContainerTouch}>
       <View style={styles.container}>
         <View style={styles.centerContent}>
-          <Text style={styles.balanceAmount}>
+          <Text style={[
+            styles.balanceAmount,
+            centerContent.value < 0 && styles.negativeAmount
+          ]}>
             {formatCurrency(centerContent.value)}
           </Text>
           <Text 
@@ -219,7 +241,7 @@ const AccountsBarChart: React.FC<AccountsBarChartProps> = ({
         </View>
         
         <View style={styles.chartContainer}>
-          {totalBalance === 0 || accounts.length === 0 ? (
+          {accounts.length === 0 ? (
             <View 
               style={[
                 styles.emptyBar,
@@ -275,6 +297,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Geist_700Bold',
     color: '#09090b',
     textAlign: 'center',
+  },
+  negativeAmount: {
+    color: '#ef4444',
   },
   balanceLabel: {
     fontSize: 22,
